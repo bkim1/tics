@@ -14,8 +14,6 @@ Professor: Lewis Tseng
 
 ## Homeworks
 
----
-
 ### Homework 1
 
 Utilizes the birthday paradox to find a collision using the SHA-1 encryption.
