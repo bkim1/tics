@@ -9,7 +9,7 @@ class BitcoinHeader():
 
     def __init__(self):
         self.hash_val = None
-        self.timestamp = time.now()
+        self.timestamp = time.time()
         self.prev = None
         self.root = None
         self.nonce = self.generate_nonce()
