@@ -46,18 +46,23 @@ def generate_data(target, num_data_points=5):
     return vector
 
 
-def generate_plots(target=240):
-    i, results, temp = 0, [], []
-    # while temp is not None:
-    while i < 3:
-        temp = generate_data(target - i)
+def generate_plots(target=235):
+    i, results, temp = 0, [], generate_data(target)
+    
+    while temp is not None and i < 10:
+        print(f'Finished: {target-i}')
         i += 1
         results.append(temp)
-        
+        print(results)
+        temp = generate_data(target - i)
 
-    fig_1, ax_1 = plt.subplots()
-    ax_1.boxplot(results, vert=True)
+    fig, ax = plt.subplots()
+    ax.boxplot(results, vert=True)
+    ax.set_title('Blockchain Puzzle')
+    ax.set_xlabel('Difficulty')
+    ax.set_ylabel('Time (s)')
     plt.show()
+
 
 if __name__ == '__main__':
     generate_plots()
