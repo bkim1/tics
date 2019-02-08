@@ -5,51 +5,38 @@ import hashlib
 
 import matplotlib.pyplot as plt
 
+from bitcoin_header import BitcoinHeader
 
-def test_difficulty(difficulty, prev_hash, new_hash, nonce, start_time):
-    m = hashlib.sha256()
+
+def test_target(header):
+    nonce, prev_hash, new_hash = header.get_values()
     temp = int(hashlib.sha256(str(nonce + prev_hash + new_hash).encode('utf-8')).hexdigest(), 16)
-    num_attempts, target = 1, 2**difficulty
+    num_attempts, target = 1, 2**header.target
+    start_time = time.time()
 
     while temp > target:
         nonce += 1
-        # temp = hash(nonce + prev_hash + new_hash)
         temp = int(hashlib.sha256(str(nonce + prev_hash + new_hash).encode('utf-8')).hexdigest(), 16)
 
         if num_attempts % 10000000 == 0:
             if time.time() - start_time > 300:
                 print('5-minutes up!')
-                return -1, -1
+                return None
             print(f'{num_attempts} have gone by')
         
         num_attempts += 1
 
-    end = time.time()
-    return end, num_attempts
+    return time.time() - start_time
 
 
-def get_time(difficulty):
-    prev_hash, new_hash = int(uuid.uuid4().hex[:16], 16), int(uuid.uuid4().hex[:16], 16)
-    nonce = int(uuid.uuid4().hex[:8], 16)
-    print(f'Prev: {prev_hash}, Nonce: {nonce}')
-    start = time.time()
-    end, num_attempts = test_difficulty(difficulty, prev_hash, new_hash, nonce, start)
-
-    if end == -1 and num_attempts == -1:
-        return None
-    print(end - start)
-
-    return end - start
-
-
-
-def generate_data(difficulty, num_data_points=5):
+def generate_data(target, num_data_points=5):
     vector, num_attempts = [], 1
     while len(vector) < 5:
         if num_attempts == 3:
             return None
 
-        result = get_time(difficulty)
+        header = BitcoinHeader(target)
+        result = test_target(header)
 
         if result is not None:
             vector.append(result)
@@ -59,10 +46,11 @@ def generate_data(difficulty, num_data_points=5):
     return vector
 
 
-def generate_plots(difficulty=235):
+def generate_plots(target=240):
     i, results, temp = 0, [], []
-    while temp is not None:
-        temp = generate_data(difficulty - i)
+    # while temp is not None:
+    while i < 3:
+        temp = generate_data(target - i)
         i += 1
         results.append(temp)
         
