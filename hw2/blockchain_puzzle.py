@@ -33,7 +33,7 @@ def test_target(header):
 def generate_data(target, num_data_points=5):
     vector, num_attempts = [], 1
     while len(vector) < num_data_points:
-        if num_attempts == 3:
+        if num_attempts > num_data_points // 2:
             return None
 
         header = BitcoinHeader(target)
