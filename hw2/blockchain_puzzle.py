@@ -18,12 +18,11 @@ def test_target(header):
         nonce += 1
         temp = int(hashlib.sha256(str(nonce + prev_hash + new_hash).encode('utf-8')).hexdigest(), 16)
 
-        if num_attempts % 10000000 == 0:
+        if num_attempts % 1000000 == 0:
             if time.time() - start_time > 300:
                 print('5-minutes up!')
                 return None
-            print(f'{num_attempts} have gone by')
-        
+
         num_attempts += 1
 
     return time.time() - start_time
@@ -53,7 +52,6 @@ def generate_plots(target=235):
         print(f'Finished: {target-i}')
         i += 1
         results.append(temp)
-        print(results)
         temp = generate_data(target - i)
 
     fig, ax = plt.subplots()
