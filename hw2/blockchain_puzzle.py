@@ -10,13 +10,15 @@ from bitcoin_header import BitcoinHeader
 
 def test_target(header):
     nonce, prev_hash, new_hash = header.get_values()
-    temp = int(hashlib.sha256(str(nonce + prev_hash + new_hash).encode('utf-8')).hexdigest(), 16)
+    byte_val = str(nonce + prev_hash + new_hash).encode('utf-8')
+    temp = int(hashlib.sha256(byte_val).hexdigest(), 16)
     num_attempts, target = 1, 2**header.target
     start_time = time.time()
 
     while temp > target:
         nonce += 1
-        temp = int(hashlib.sha256(str(nonce + prev_hash + new_hash).encode('utf-8')).hexdigest(), 16)
+        byte_val = str(nonce + prev_hash + new_hash).encode('utf-8')
+        temp = int(hashlib.sha256(byte_val).hexdigest(), 16)
 
         if num_attempts % 1000000 == 0:
             if time.time() - start_time > 300:
@@ -30,7 +32,7 @@ def test_target(header):
 
 def generate_data(target, num_data_points=5):
     vector, num_attempts = [], 1
-    while len(vector) < 5:
+    while len(vector) < num_data_points:
         if num_attempts == 3:
             return None
 
