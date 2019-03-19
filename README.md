@@ -23,6 +23,10 @@ Utilizes the birthday paradox to find a collision using the SHA-1 encryption.
 
 Estimates the time of solving a hash-based puzzle given certain degrees of difficulty. Outputs a box-plot to show the results.
 
+#### Homework 3
+
+Implements a simple distributed system for verifying hash-based puzzle solutions. Includes a simple server (verifier) and client (solver) where the client sends its solved puzzle to the server to get confirmation that it is a valid solution.
+
 
 
 ## How to Install
