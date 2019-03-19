@@ -5,6 +5,6 @@ Implements a simple distributed system for verifying hash-based puzzle solutions
 ## How to Run
 
 1. Setup the repo if necessary (check the main page README for instructions)
-2. Navigate to the homework 2 folder using `cd hw3`
+2. Navigate to the homework 3 folder using `cd hw3`
 3. Run the server (verifier) using `python puzzle_verifier.py`
 4. Run the client (solver) using `python puzzle_solver.py`
