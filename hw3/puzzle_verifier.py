@@ -6,6 +6,7 @@ from threading import Thread, current_thread
 
 
 MAX_BUFFER_SIZE=1024
+DIFFICULTY=235
 
 
 def start_server(host, port):
@@ -54,7 +55,8 @@ def verify_message(connection):
                            message['block_hash']).encode('utf-8')
             temp_hash = int(hashlib.sha256(byte_val).hexdigest(), 16)
 
-            if temp_hash < 2**message['difficulty']:
+            if message['difficulty'] == DIFFICULTY and \
+                    temp_hash < 2**DIFFICULTY:
                 send_val = { 'valid': True }
             else:
                 send_val = { 'valid': False }
