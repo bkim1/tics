@@ -2,6 +2,7 @@ import uuid
 import time
 import json
 
+
 class BitcoinHeader:
     """ Class representing a Bitcoin Header object """
 

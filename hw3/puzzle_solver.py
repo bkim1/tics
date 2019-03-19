@@ -53,7 +53,9 @@ def main():
             print('Error connecting to verifier')
             sys.exit()
 
-        # Send solved puzzle to verifier
+        # Send solved puzzle to verifier as JSON object
+        # Similar to Bitcoin's implementation in their blockchain.cpp
+        # file under src/rpc/
         s.sendall(header.get_json_str().encode('utf-8'))
 
         # Wait for verifier to send message back and unpack it as a JSON object
