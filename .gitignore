@@ -1,5 +1,6 @@
 .vscode/
 
+.DS_Store
 .DS_Store/
 */.DS_Store/
 
@@ -9,4 +10,5 @@ venv/
 
 *.png
 
+*.iml
 .idea/
