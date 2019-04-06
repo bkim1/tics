@@ -9,11 +9,12 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private ReqType msgType;
-    private byte[] key, data;
+    private long key;
+    private byte[] data;
     private Peer peer;
     private List<Peer> updatedPeers;
 
-    public Message(ReqType msgType, Peer peer, byte[] key, byte[] data) {
+    public Message(ReqType msgType, Peer peer, long key, byte[] data) {
         this.msgType = msgType;
         this.peer = peer;
         this.key = key;
@@ -34,8 +35,8 @@ public class Message implements Serializable {
     public ReqType getReqType() { return this.msgType; }
     public void setReqType(ReqType rt) { this.msgType = rt; }
 
-    public byte[] getKey() { return this.key; }
-    public void setKey(byte[] key) { this.key = key; }
+    public long getKey() { return this.key; }
+    public void setKey(long key) { this.key = key; }
 
     public byte[] getData() { return this.data; }
     public void setData(byte[] data) { this.data = data; }
