@@ -6,9 +6,9 @@ import java.net.UnknownHostException;
 public class Peer {
     private InetAddress ip;
     private int port;
-    private byte[] key;
+    private long key;
 
-    public Peer(InetAddress ip, int port, byte[] key) {
+    public Peer(InetAddress ip, int port, long key) {
         this.ip = ip;
         this.port = port;
         this.key = key;
@@ -23,6 +23,6 @@ public class Peer {
     public int getPort() { return this.port; }
     public void setPort(int port) { this.port = port; }
 
-    public byte[] getKey() { return this.key; }
-    public void setKey(byte[] key) { this.key = key; }
+    public long getKey() { return this.key; }
+    public void setKey(long key) { this.key = key; }
 }

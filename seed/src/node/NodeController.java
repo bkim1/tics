@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import object.*;
 import node.Node;
-import object.FileInfo;
 
 public class NodeController {
     private Node node;
@@ -42,5 +42,10 @@ public class NodeController {
 
     public String getDownloadLoc() {
         return this.applicationProps.getProperty("downloadLoc");
+    }
+
+    public Peer getPeerObject() {
+        // ip, port, key
+        return new Peer(this.node.getIP(), this.node.getPort(), this.node.getPeerId());
     }
 }

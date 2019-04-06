@@ -23,6 +23,7 @@ public class Node {
     private int port;
     private List<Peer> fingerTable;
     private Map<String, PeerData> peerFiles;
+    private Peer predecessor;
     private Map<String, FileInfo> myFiles;
 
     public Node(InetAddress ip, int port) {
@@ -65,6 +66,12 @@ public class Node {
 
     public int getPort() { return this.port; }
     public void setPort(int port) { this.port = port; }
+
+    public Peer getSuccessor() { return this.fingerTable.get(0); }
+    public void setSuccessor(Peer p) { this.fingerTable.set(0, p); }
+
+    public Peer getPredecessor() { return this.predecessor; }
+    public void setPredecessor(Peer p) { this.predecessor = p; }
 
     public List<Peer> getFingerTable() { return this.fingerTable; }
     public void updateFingerTable(List<Peer> fingerTable) { this.fingerTable = fingerTable; }
