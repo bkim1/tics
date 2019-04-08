@@ -10,11 +10,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 
-import object.Peer;
+import object.*;
 
 public class Utilities {
 
-	public static Peer lookUp(Peer peer, long key, List<Peer> fingerTable) {
+	public static Peer lookUp(Message msg, List<Peer> fingerTable) {
 		boolean smallerThan = true;
 		for(Peer finger : fingerTable) {
 			if(key == peerHash(finger.getIP(), finger.getPort())) {

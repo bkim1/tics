@@ -1,11 +1,7 @@
 package thread;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -36,7 +32,7 @@ public class PeerRequestThread implements Runnable {
 			sendFile(msg.getPeer(), msg.getKey());
 			break;
 		case LOOKUP:
-			lookUp(msg.getPeer(), msg.getKey());
+			lookUp();
 			break;
 		}
 	}
@@ -65,8 +61,14 @@ public class PeerRequestThread implements Runnable {
 		}
 	}
 	
+	public void join() {
+		
+	}
+	
 	public Peer lookUp() {
 		return Utilities.lookUp(msg, nc.getFingerTables());
 	}
+	
+	
 
 }
