@@ -3,6 +3,7 @@ package node;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -47,5 +48,14 @@ public class NodeController {
     public Peer getPeerObject() {
         // ip, port, key
         return new Peer(this.node.getIP(), this.node.getPort(), this.node.getPeerId());
+    }
+    
+    public List<Peer> getFingerTables(){
+    	
+    		return this.node.getFingerTable();
+    }
+    
+    public PeerData getPeerFiles(long key){
+    		return this.node.getPeerData(key);
     }
 }
