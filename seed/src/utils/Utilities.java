@@ -15,12 +15,17 @@ import object.*;
 public class Utilities {
 
 	public static Peer lookUp(Message msg, List<Peer> fingerTable) {
-		boolean smallerThan = true;
-		for(Peer finger : fingerTable) {
-			if(key == peerHash(finger.getIP(), finger.getPort())) {
+		Peer finger;
+		for(int i = 0; i < fingerTable.size(); i++) {
+			finger = fingerTable.get(i);
+			long fingerHash = peerHash(finger.getIP(), finger.getPort());
+			if(msg.getKey() == fingerHash) {
 				return finger;
 			}
-			else if(smallerThan && ())
+			//if we reach a Node whose hash is larger, we have to return the previous Node
+			else if(msg.getKey() < fingerHash) {
+				return fingerTable.get(i-1);
+			}
 		}
 		return null;
 	}
