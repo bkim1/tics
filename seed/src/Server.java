@@ -51,34 +51,26 @@ public class Server {
 
     private void processMessage(Message msg, Socket peerSocket) throws IOException {
         Thread t;
-        PeerRequestThread prThread;
-    
+        
         switch(msg.getReqType()) {
-            case JOIN:
-                prThread = new PeerRequestThread(msg, this.nc);
-                t = new Thread(prThread);
-                break;
-            case LOOKUP:
-                prThread = new PeerRequestThread(msg, this.nc);
+            case JOIN: case LOOKUP: case UPLOAD:
+                PeerRequestThread prThread = new PeerRequestThread(msg, this.nc);
                 t = new Thread(prThread);
                 break;
             case SEND:
                 ReceiveFileThread rfThread = new ReceiveFileThread(msg, this.nc, peerSocket);
                 t = new Thread(rfThread);
                 break;
-            case STABILIZE:
+            case STABILIZE: case STABILIZE_PRED_RESP: case STABILIZE_PRED_REQ:
                 StabilizeThread sThread = new StabilizeThread(msg, this.nc);
                 t = new Thread(sThread);
-                break;
-            case UPLOAD:
-                prThread = new PeerRequestThread(msg, this.nc);
-                t = new Thread(prThread);
                 break;
             default:
                 System.out.println("Unknown ReqType... Closing socket.");
                 peerSocket.close();
                 return;
         }
+        peerSocket.close();
         t.start();
     }
 
