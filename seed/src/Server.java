@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import node.*;
 import object.Message;
 import object.ReqType;
+import thread.PeerRequestThread;
 import thread.ReceiveFileThread;
 import thread.StabilizeThread;
 
@@ -50,35 +51,35 @@ public class Server {
 
     private void processMessage(Message msg, Socket peerSocket) throws IOException {
         Thread t;
+        PeerRequestThread prThread;
+    
         switch(msg.getReqType()) {
             case JOIN:
-                // PeerRequestThread prThread = new PeerRequestThread(msg, this.nc);
-                // t = new Thread(prThread);
+                prThread = new PeerRequestThread(msg, this.nc);
+                t = new Thread(prThread);
                 break;
             case LOOKUP:
-                // PeerRequestThread prThread = new PeerRequestThread(msg, this.nc);
-                // t = new Thread(prThread);
+                prThread = new PeerRequestThread(msg, this.nc);
+                t = new Thread(prThread);
                 break;
             case SEND:
                 ReceiveFileThread rfThread = new ReceiveFileThread(msg, this.nc, peerSocket);
                 t = new Thread(rfThread);
-                t.start();
                 break;
             case STABILIZE:
                 StabilizeThread sThread = new StabilizeThread(msg, this.nc);
                 t = new Thread(sThread);
-                t.start();
                 break;
             case UPLOAD:
-                // PeerRequestThread prThread = new PeerRequestThread(msg, this.nc);
-                // t = new Thread(prThread);
+                prThread = new PeerRequestThread(msg, this.nc);
+                t = new Thread(prThread);
                 break;
             default:
                 System.out.println("Unknown ReqType... Closing socket.");
                 peerSocket.close();
                 return;
         }
-        // t.start();
+        t.start();
     }
 
     public static void main(String[] args) throws IOException {
