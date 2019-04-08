@@ -54,4 +54,8 @@ public class NodeController {
     	
     		return this.node.getFingerTable();
     }
+    
+    public PeerData getPeerFiles(long key){
+    		return this.node.getPeerData(key);
+    }
 }
