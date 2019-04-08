@@ -7,12 +7,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 
 import node.NodeController;
 import object.Message;
-import object.Peer;
+import object.*;
 import utils.Utilities;
 
 public class PeerRequestThread implements Runnable {
@@ -45,7 +46,13 @@ public class PeerRequestThread implements Runnable {
 		if((data = nc.getPeerFiles(key)) != null) {
 			try {
 				Socket socket = new Socket(peer.getIP(), peer.getPort());
-				
+				Peer sender = nc.getPeerObject();
+				Message msg = new Message(ReqType.SEND, sender, data.getKey(), data.getData());
+				OutputStream os = socket.getOutputStream(); 
+				ObjectOutputStream oos = new ObjectOutputStream(os);
+				oos.flush();
+				oos.writeObject(msg);   //send object to server
+				oos.flush();
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -53,12 +60,13 @@ public class PeerRequestThread implements Runnable {
 			}
 		}
 		else {
-			List<Peer> fingerTable = nc.getFingerTables();
+			lookUp();
+			
 		}
 	}
 	
-	public Peer lookUp(Peer peer, long key) {
-		return Utilities.lookUp(peer, key, nc.getFingerTables());
+	public Peer lookUp() {
+		return Utilities.lookUp(msg, nc.getFingerTables());
 	}
 
 }
