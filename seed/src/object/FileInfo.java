@@ -19,11 +19,15 @@ public class FileInfo {
     private List<DataShard> shardHashes;
     private byte[] salt;
     private long key;
+    private boolean isReceiving;
+    private int currentReceived;
 
     public FileInfo(String filename, List<DataShard> shardHashes) {
         this.filename = filename;
         this.shardHashes = shardHashes;
         this.salt = new byte[SALT_SIZE];
+        this.isReceiving = false;
+        this.currentReceived = 0;
         
         this.generateSalt();
         this.updateKey();
@@ -32,6 +36,9 @@ public class FileInfo {
     public FileInfo(String fileLoc, String filename) {
         this.filename = filename;
         this.shardHashes = new ArrayList<>();
+        this.isReceiving = false;
+        this.currentReceived = 0;
+
         this.generateSalt();
         this.updateKey();
         this.addFile(fileLoc, this.filename);
@@ -71,4 +78,11 @@ public class FileInfo {
             e.printStackTrace();
         }
     }
+
+    public boolean isReceiving() { return this.isReceiving; }
+    public void setReceiving(boolean b) { this.isReceiving = b; }
+
+    public int getNumReceived() { return this.currentReceived; }
+    public void resetReceived() { this.currentReceived = 0; }
+    public void incrememntReceived() { this.currentReceived++; }
 }

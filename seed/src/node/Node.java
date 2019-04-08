@@ -67,6 +67,8 @@ public class Node {
     public int getPort() { return this.port; }
     public void setPort(int port) { this.port = port; }
 
+    public Peer getPeerObject() { return new Peer(this.ip, this.port, this.peerId); }
+
     public Peer getSuccessor() { return this.fingerTable.get(0); }
     public void setSuccessor(Peer p) { this.fingerTable.set(0, p); }
 

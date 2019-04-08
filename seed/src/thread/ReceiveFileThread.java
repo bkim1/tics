@@ -3,10 +3,8 @@ package thread;
 import object.*;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -21,11 +19,11 @@ public class ReceiveFileThread implements Runnable {
     private Socket socket;
     private InputStream inputStream;
 
-    public ReceiveFileThread(Message msg, NodeController nc) throws IOException {
+    public ReceiveFileThread(Message msg, NodeController nc, Socket peerSocket) throws IOException {
         this.msg = msg;
         this.nc = nc;
         this.peer = msg.getPeer();
-        this.socket = new Socket(this.peer.getIP(), this.peer.getPort());
+        this.socket = peerSocket;
         this.inputStream = this.socket.getInputStream();
     }
     
@@ -34,6 +32,7 @@ public class ReceiveFileThread implements Runnable {
         // Peer's info from msg
         try {
             String filename = this.getFile();
+            this.verify(filename);
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -61,7 +60,7 @@ public class ReceiveFileThread implements Runnable {
         return fileName;
     }
 
-    private void verify() {
-        
+    private void verify(String filename) {
+
     }
 }

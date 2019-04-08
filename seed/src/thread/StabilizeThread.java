@@ -14,13 +14,13 @@ public class StabilizeThread implements Runnable {
     
     public void run() {
         switch (this.msg.getReqType()) {
-            case "STABILIZE":
+            case STABILIZE:
                 stabilzeInit();
                 break;
-            case "STABILIZE_PRED_RESP":
+            case STABILIZE_PRED_RESP:
                 handleStabilizeResp();
                 break;
-            case "STABILIZE_PRED_REQ":
+            case STABILIZE_PRED_REQ:
                 handleStabilzeReq();
             default:
                 break;

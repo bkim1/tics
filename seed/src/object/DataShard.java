@@ -20,7 +20,7 @@ public class DataShard {
     public DataShard(String fileLoc, String filename, byte[] salt) {
         this.filename = filename;
 
-        try{
+        try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(this.filename.getBytes(Charset.forName("UTF-8")));
             digest.update(salt);
