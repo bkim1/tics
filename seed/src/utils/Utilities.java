@@ -8,23 +8,21 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.List;
 
 import object.*;
 
 public class Utilities {
 
-	public static Peer lookUp(Message msg, List<Peer> fingerTable) {
+	public static Peer lookUp(Message msg, Peer[] fingerTable) {
 		Peer finger;
-		for(int i = 0; i < fingerTable.size(); i++) {
-			finger = fingerTable.get(i);
-			long fingerHash = peerHash(finger.getIP(), finger.getPort());
-			if(msg.getKey() == fingerHash) {
+		for(int i = 0; i < fingerTable.length; i++) {
+			finger = fingerTable[i];
+			if(msg.getKey() == finger.getKey()) {
 				return finger;
 			}
 			//if we reach a Node whose hash is larger, we have to return the previous Node
-			else if(msg.getKey() < fingerHash) {
-				return fingerTable.get(i-1);
+			else if(msg.getKey() < finger.getKey()) {
+				return fingerTable[i-1];
 			}
 		}
 		return null;
