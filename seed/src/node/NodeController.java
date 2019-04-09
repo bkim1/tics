@@ -50,12 +50,11 @@ public class NodeController {
         return new Peer(this.node.getIP(), this.node.getPort(), this.node.getPeerId());
     }
     
-    public List<Peer> getFingerTables(){
-    	
-    		return this.node.getFingerTable();
+    public Peer[] getFingerTables() {
+        return this.node.getFingerTable();
     }
     
-    public PeerData getPeerFiles(long key){
-    		return this.node.getPeerData(key);
+    public PeerData getPeerFiles(long key) {
+        return this.node.getPeerData(key);
     }
 }
