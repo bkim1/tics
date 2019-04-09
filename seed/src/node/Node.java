@@ -21,7 +21,7 @@ public class Node {
     private long peerId;
     private InetAddress ip;
     private int port;
-    private List<Peer> fingerTable;
+    private Peer[] fingerTable;
     private Map<String, PeerData> peerFiles;
     private Peer predecessor;
     private Map<String, FileInfo> myFiles;
@@ -29,7 +29,7 @@ public class Node {
     public Node(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.fingerTable = new ArrayList<>();
+        this.fingerTable = new Peer[RING_SIZE];
         this.peerFiles = new HashMap<>();
         this.myFiles = new HashMap<>();
     }
@@ -69,14 +69,14 @@ public class Node {
 
     public Peer getPeerObject() { return new Peer(this.ip, this.port, this.peerId); }
 
-    public Peer getSuccessor() { return this.fingerTable.get(0); }
-    public void setSuccessor(Peer p) { this.fingerTable.set(0, p); }
+    public Peer getSuccessor() { return this.fingerTable[0]; }
+    public void setSuccessor(Peer p) { this.fingerTable[0] = p; }
 
     public Peer getPredecessor() { return this.predecessor; }
     public void setPredecessor(Peer p) { this.predecessor = p; }
 
-    public List<Peer> getFingerTable() { return this.fingerTable; }
-    public void updateFingerTable(List<Peer> fingerTable) { this.fingerTable = fingerTable; }
+    public Peer[] getFingerTable() { return this.fingerTable; }
+    public void updateFingerTable(Peer[] fingerTable) { this.fingerTable = fingerTable; }
 
     public Map<String, PeerData> getPeerFiles() { return this.peerFiles; }
     public PeerData getPeerData(long key) {
