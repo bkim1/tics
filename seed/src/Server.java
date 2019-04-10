@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
@@ -11,9 +10,7 @@ import java.net.UnknownHostException;
 import node.*;
 import object.Message;
 import object.ReqType;
-import thread.PeerRequestThread;
-import thread.ReceiveFileThread;
-import thread.StabilizeThread;
+import thread.*;
 
 
 public class Server {
@@ -56,6 +53,7 @@ public class Server {
             case JOIN: case LOOKUP: case UPLOAD:
                 PeerRequestThread prThread = new PeerRequestThread(msg, this.nc);
                 t = new Thread(prThread);
+                peerSocket.close();
                 break;
             case SEND:
                 ReceiveFileThread rfThread = new ReceiveFileThread(msg, this.nc, peerSocket);
@@ -64,13 +62,13 @@ public class Server {
             case STABILIZE: case STABILIZE_PRED_RESP: case STABILIZE_PRED_REQ:
                 StabilizeThread sThread = new StabilizeThread(msg, this.nc);
                 t = new Thread(sThread);
+                peerSocket.close();
                 break;
             default:
                 System.out.println("Unknown ReqType... Closing socket.");
                 peerSocket.close();
                 return;
         }
-        peerSocket.close();
         t.start();
     }
 
