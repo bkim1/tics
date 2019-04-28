@@ -1,20 +1,14 @@
 package node;
 
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import object.FileInfo;
 import object.Peer;
 import object.PeerData;
 import static utils.Constants.RING_SIZE;
+import static utils.Utilities.generatePeerId;;
 
 public class Node {
     private String password;
@@ -38,34 +32,24 @@ public class Node {
     private void generateKey() {}
 
     public long getPeerId() { return this.peerId; }
-    private void updatePeerId() {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(this.ip.toString().getBytes(Charset.forName("UTF-8")));
-            digest.update(Integer.valueOf(this.port).byteValue());
-            byte[] bytes = Arrays.copyOfRange(digest.digest(), 0, RING_SIZE);
-
-            ByteBuffer buffer = ByteBuffer.wrap(bytes);
-            this.peerId = buffer.getLong();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void updateAddress(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.updatePeerId();
+        this.peerId = generatePeerId(this.ip, this.port);
     }
 
     public InetAddress getIP() { return this.ip; }
     public void setIP(InetAddress ip) {
         this.ip = ip;
-        this.updatePeerId();
+        this.peerId = generatePeerId(this.ip, this.port);
     }
 
     public int getPort() { return this.port; }
-    public void setPort(int port) { this.port = port; }
+    public void setPort(int port) {
+        this.port = port;
+        this.peerId = generatePeerId(this.ip, this.port);
+    }
 
     public Peer getPeerObject() { return new Peer(this.ip, this.port, this.peerId); }
 
@@ -77,6 +61,7 @@ public class Node {
 
     public Peer[] getFingerTable() { return this.fingerTable; }
     public void updateFingerTable(Peer[] fingerTable) { this.fingerTable = fingerTable; }
+    public void updateFingerTable(Peer peer, int index) { this.fingerTable[index] = peer; }
 
     public Map<String, PeerData> getPeerFiles() { return this.peerFiles; }
     public PeerData getPeerData(long key) {

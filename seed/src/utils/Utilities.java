@@ -28,7 +28,7 @@ public class Utilities {
 		return null;
 	}
 	
-	public static long peerHash(InetAddress ip, int port) {
+	public static long generatePeerId(InetAddress ip, int port) {
 		long key = -1;
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
