@@ -43,7 +43,9 @@ public class Server {
     
     private Message getMessage(Socket peerSocket) throws IOException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(peerSocket.getInputStream());
-        return (Message) in.readObject();
+        Message msg = (Message) in.readObject();
+        in.close();
+        return msg;
     }
 
     private void processMessage(Message msg, Socket peerSocket) throws IOException {
@@ -73,15 +75,16 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException {
-        BufferedReader fromKeyboard = new BufferedReader(new InputStreamReader(System.in));
         int serverPort;
-
+        
         if (args.length > 0) {
             serverPort = Integer.parseInt(args[0]);
         }
         else {
+            BufferedReader fromKeyboard = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Enter Port #: ");
             serverPort = Integer.parseInt(fromKeyboard.readLine());
+            fromKeyboard.close();
         }
         new Server(serverPort).run();
     }
