@@ -60,4 +60,11 @@ public class NodeController {
     public synchronized Peer getSuccessor() {
         return this.node.getFingerTable()[0];
     }
+
+    public synchronized String getFilename(long key) {
+        String strKey = Long.toString(key);
+        FileInfo info = this.currentLookup.get(strKey);
+
+        return info.getFilename();
+    }
 }

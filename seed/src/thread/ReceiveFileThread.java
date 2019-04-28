@@ -32,7 +32,9 @@ public class ReceiveFileThread implements Runnable {
         // Peer's info from msg
         try {
             String filename = this.getFile();
-            this.verify(filename);
+            if (this.verify(filename)) {
+                
+            }
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -40,7 +42,7 @@ public class ReceiveFileThread implements Runnable {
 
     private String getFile() throws IOException {
         String downloadLoc = this.nc.getDownloadLoc();
-        String fileName = downloadLoc + LocalDateTime.now().toString() + "-output.txt";
+        String fileName = downloadLoc + this.nc.getFilename(this.msg.getKey());
         File outputFile = new File(fileName);
         outputFile.createNewFile();
 
@@ -60,7 +62,7 @@ public class ReceiveFileThread implements Runnable {
         return fileName;
     }
 
-    private void verify(String filename) {
-
+    private boolean verify(String filename) {
+        return false;
     }
 }

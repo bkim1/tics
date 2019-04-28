@@ -23,7 +23,7 @@ public class FileInfo {
     private int currentReceived;
 
     public FileInfo(String filename, List<DataShard> shardHashes) {
-        this.filename = filename;
+        this.filename = this.stripFilePath(filename);
         this.shardHashes = shardHashes;
         this.salt = new byte[SALT_SIZE];
         this.isReceiving = false;
@@ -49,9 +49,17 @@ public class FileInfo {
         this.filename = filename;
         this.updateKey();
     }
+    private String stripFilePath(String filename) {
+        int lastIndexOf = filename.lastIndexOf("/");
+        if (lastIndexOf == -1) {
+            return filename; // empty extension
+        }
+        return filename.substring(lastIndexOf + 1);
+    }
 
     private void addFile(String fileLoc, String filename) {
-        DataShard shard = new DataShard(fileLoc, filename, this.salt);
+        String strippedFilename = this.stripFilePath(filename);
+        DataShard shard = new DataShard(fileLoc, strippedFilename, this.salt);
         this.shardHashes.add(shard);
     }
 
