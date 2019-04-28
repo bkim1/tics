@@ -14,18 +14,23 @@ import object.*;
 public class Utilities {
 
 	public static Peer lookUp(Message msg, Peer[] fingerTable) {
-		Peer finger;
-		for(int i = 0; i < fingerTable.length; i++) {
+		Peer finger = null;
+		int length = fingerTable.length;
+		for(int i = 0; i < length; i++) {
 			finger = fingerTable[i];
-			if(msg.getKey() == finger.getKey()) {
+			
+			if(finger.equals(msg.getPeer())) {
+				return null;
+			}
+			else if(msg.getKey() == finger.getKey()) {
 				return finger;
 			}
-			//if we reach a Node whose hash is larger, we have to return the previous Node
-			else if(msg.getKey() < finger.getKey()) {
-				return fingerTable[i-1];
+			//if we reach a node whose successor's key is larger than the file hash, we return the successor
+			else if(msg.getKey() > finger.getKey() && i+1 < length && fingerTable[i+1].getKey() > msg.getKey()) {
+				return fingerTable[i+1];
 			}
 		}
-		return null;
+		return finger;
 	}
 	
 	public static long generatePeerId(InetAddress ip, int port) {

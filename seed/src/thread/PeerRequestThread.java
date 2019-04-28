@@ -4,6 +4,7 @@ package thread;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
@@ -28,11 +29,19 @@ public class PeerRequestThread implements Runnable {
 		case JOIN:
 			join();
 			break;
-		case SEND:
-			sendFile(msg.getPeer(), msg.getKey());
-			break;
 		case LOOKUP:
-			lookUp();
+			Peer current = nc.getPeerObject();
+			InetAddress currentIP = current.getIP();
+			System.out.println("Node " + currentIP + " now performing look up...");
+			Peer next = lookUp();
+			if(next == null) { System.out.println("File not found."); }
+			else if(current.equals(next)) { System.out.println("File has been found."); }
+			else { 
+				System.out.println("The look up is now occuring at node " + next.getIP());
+			}
+			break;
+		case UPLOAD:
+			
 			break;
 		}
 	}
@@ -56,8 +65,7 @@ public class PeerRequestThread implements Runnable {
 			}
 		}
 		else {
-			lookUp();
-			
+			lookUp();	
 		}
 	}
 	
@@ -66,6 +74,26 @@ public class PeerRequestThread implements Runnable {
 	}
 	
 	public Peer lookUp() {
+		PeerData data;
+		Peer receiver = msg.getPeer();
+		
+		if((data = nc.getPeerFiles(msg.getKey())) != null) {
+			try {
+				Socket socket = new Socket(receiver.getIP(), receiver.getPort());
+				Peer sender = nc.getPeerObject();
+				Message msg = new Message(ReqType.SEND, sender, data.getKey(), data.getData());
+				OutputStream os = socket.getOutputStream(); 
+				ObjectOutputStream oos = new ObjectOutputStream(os);
+				oos.flush();
+				oos.writeObject(msg);   //send object to server
+				oos.flush();
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return nc.getPeerObject();
+		}
 		return Utilities.lookUp(msg, nc.getFingerTables());
 	}
 	
