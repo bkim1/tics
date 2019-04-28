@@ -31,6 +31,8 @@ public class NodeController {
         in.close();
     }
 
+    public Node getNode() { return this.node; }
+
     public synchronized void addLookup(long key, FileInfo info) {
         String strKey = Long.toString(key);
         this.currentLookup.put(strKey, info);

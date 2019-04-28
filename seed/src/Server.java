@@ -19,11 +19,20 @@ public class Server {
     private Node node;
     private NodeController nc;
 
-    public Server(int port) throws IOException {
+    public Server(int port) throws IOException, InterruptedException {
         this.port = port;
         this.serverSocket = new ServerSocket(this.port);
         this.node = new Node(InetAddress.getLocalHost(), this.port);
         this.nc = new NodeController(node);
+
+        SetupThread sThread = new SetupThread(this.node, this.serverSocket);
+        Thread t = new Thread(sThread);
+        t.start();
+        t.join();
+
+        // UserRequestThread uThread = new UserRequestThread();
+        // t = new Thread(uThread);
+        // t.start();
     }
 
     public void run() throws UnknownHostException, IOException {
@@ -53,7 +62,7 @@ public class Server {
         
         switch(msg.getReqType()) {
             case JOIN: case LOOKUP: case UPLOAD:
-                PeerRequestThread prThread = new PeerRequestThread(msg, this.nc);
+                PeerRequestThread prThread = new PeerRequestThread(msg, this.node);
                 t = new Thread(prThread);
                 peerSocket.close();
                 break;
@@ -74,7 +83,7 @@ public class Server {
         t.start();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         int serverPort;
         
         if (args.length > 0) {

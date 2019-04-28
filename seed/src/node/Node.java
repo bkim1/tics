@@ -33,20 +33,20 @@ public class Node {
 
     public long getPeerId() { return this.peerId; }
 
-    public void updateAddress(InetAddress ip, int port) {
+    public synchronized void updateAddress(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
         this.peerId = generatePeerId(this.ip, this.port);
     }
 
     public InetAddress getIP() { return this.ip; }
-    public void setIP(InetAddress ip) {
+    public synchronized void setIP(InetAddress ip) {
         this.ip = ip;
         this.peerId = generatePeerId(this.ip, this.port);
     }
 
     public int getPort() { return this.port; }
-    public void setPort(int port) {
+    public synchronized void setPort(int port) {
         this.port = port;
         this.peerId = generatePeerId(this.ip, this.port);
     }
@@ -54,25 +54,24 @@ public class Node {
     public Peer getPeerObject() { return new Peer(this.ip, this.port, this.peerId); }
 
     public Peer getSuccessor() { return this.fingerTable[0]; }
-    public void setSuccessor(Peer p) { this.fingerTable[0] = p; }
+    public synchronized void setSuccessor(Peer p) { this.fingerTable[0] = p; }
 
     public Peer getPredecessor() { return this.predecessor; }
-    public void setPredecessor(Peer p) { this.predecessor = p; }
+    public synchronized void setPredecessor(Peer p) { this.predecessor = p; }
 
     public Peer[] getFingerTable() { return this.fingerTable; }
-    public void updateFingerTable(Peer[] fingerTable) { this.fingerTable = fingerTable; }
-    public void updateFingerTable(Peer peer, int index) { this.fingerTable[index] = peer; }
+    public synchronized void updateFingerTable(Peer[] fingerTable) { this.fingerTable = fingerTable; }
+    public synchronized void updateFingerTable(Peer peer, int index) { this.fingerTable[index] = peer; }
 
     public Map<String, PeerData> getPeerFiles() { return this.peerFiles; }
     public PeerData getPeerData(long key) {
         return this.peerFiles.get(Long.toString(key));
     }
-    public void addPeerFile(PeerData data) {
+    public synchronized void addPeerFile(PeerData data) {
         String strKey = Long.toString(data.getKey());
         this.peerFiles.put(strKey, data);
     }
 
     public Map<String, FileInfo> getMyFiles() { return this.myFiles; }
-    public void addFile(FileInfo file) { this.myFiles.put(file.getFilename(), file); }
-
+    public synchronized void addFile(FileInfo file) { this.myFiles.put(file.getFilename(), file); }
 }
