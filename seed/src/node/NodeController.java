@@ -3,7 +3,6 @@ package node;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -32,29 +31,33 @@ public class NodeController {
         in.close();
     }
 
-    public void addLookup(long key, FileInfo info) {
+    public synchronized void addLookup(long key, FileInfo info) {
         String strKey = Long.toString(key);
         this.currentLookup.put(strKey, info);
     }
 
-    public FileInfo getFileInfo(long key) {
+    public synchronized FileInfo getFileInfo(long key) {
         return this.currentLookup.get(Long.toString(key));
     }
 
-    public String getDownloadLoc() {
+    public synchronized String getDownloadLoc() {
         return this.applicationProps.getProperty("downloadLoc");
     }
 
-    public Peer getPeerObject() {
+    public synchronized Peer getPeerObject() {
         // ip, port, key
         return new Peer(this.node.getIP(), this.node.getPort(), this.node.getPeerId());
     }
     
-    public Peer[] getFingerTables() {
+    public synchronized Peer[] getFingerTables() {
         return this.node.getFingerTable();
     }
     
-    public PeerData getPeerFiles(long key) {
+    public synchronized PeerData getPeerFiles(long key) {
         return this.node.getPeerData(key);
+    }
+
+    public synchronized Peer getSuccessor() {
+        return this.node.getFingerTable()[0];
     }
 }
