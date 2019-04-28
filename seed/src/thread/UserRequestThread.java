@@ -8,6 +8,7 @@ import node.NodeController;
 import object.Message;
 import object.*;
 import utils.Utilities;
+import java.util.Scanner;
 
 
 
@@ -22,20 +23,37 @@ public class UserRequestThread implements Runnable {
         this.peer = msg.getPeer();
     }
     
-    public void run() {
-        switch(msg.getReqType()) {
-            case LOOKUP:
-                lookUp();
-                break;
-            }
-    }
+	public void run() {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter 1 for file upload, 2 for file retrieval");
+        Int answer = scan.nextInt();
+        if (answer == 1){
+            upload();
+        }
+        else{
+            initializeLookupRequest();
+        }
+		switch(msg.getReqType()) {
+		case LOOKUP:
+			initializeLookupRequest();
+            break;
+        case UPLOAD:
+            upload();
+            break;
+		}
+	}
 
     public void upload(){ //using lookup method, forward along appropriately
-        System.out.println("Would");
+        System.out.println("");
+    }
+
+    public void initializeLookupRequest(){
+
     }
 
 }
 
 //upload
-//leaveNetwork
 //initiializeLookupRequest
+//later: change default download directory
+//later: leaveNetwork
