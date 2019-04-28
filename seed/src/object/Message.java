@@ -6,7 +6,7 @@ import java.util.List;
 import object.Peer;
 
 public class Message implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3258205L;
 
     private ReqType msgType;
     private long key;

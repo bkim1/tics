@@ -1,9 +1,12 @@
 package object;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class Peer {
+public class Peer implements Serializable {
+    private static final long serialVersionUID = 314156L;
+
     private InetAddress ip;
     private int port;
     private long key;
