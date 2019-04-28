@@ -28,4 +28,10 @@ public class Peer implements Serializable {
 
     public long getKey() { return this.key; }
     public void setKey(long key) { this.key = key; }
+
+    public boolean equals(Peer peer) {
+        return this.ip.equals(peer.getIP()) &&
+               this.port == peer.getPort() &&
+               this.key == peer.getKey();
+    }
 }
