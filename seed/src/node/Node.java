@@ -20,7 +20,12 @@ public class Node {
     private Peer predecessor;
     private Map<String, FileInfo> myFiles;
     
-    private static Object sharedLock = new Object();
+    private static Object addressLock = new Object();
+    private static Object peerLock = new Object();
+    private static Object peerFilesLock = new Object();
+    private static Object fingerTableLock = new Object();
+    private static Object myFilesLock = new Object();
+
 
     public Node(InetAddress ip, int port) {
         this.ip = ip;
@@ -31,20 +36,20 @@ public class Node {
     }
 
     public String getKey() {
-        synchronized(sharedLock) {
+        synchronized(addressLock) {
             return this.password;
         }
     }
     private void generateKey() {}
 
     public long getPeerId() {
-        synchronized(sharedLock) {
+        synchronized(addressLock) {
             return this.peerId;
         }
     }
 
     public void updateAddress(InetAddress ip, int port) {
-        synchronized(sharedLock) {
+        synchronized(addressLock) {
             this.ip = ip;
             this.port = port;
             this.peerId = generatePeerId(this.ip, this.port);
@@ -52,97 +57,97 @@ public class Node {
     }
 
     public InetAddress getIP() {
-        synchronized(sharedLock) {
+        synchronized(addressLock) {
             return this.ip;
         }
     }
     public void setIP(InetAddress ip) {
-        synchronized(sharedLock) {
+        synchronized(addressLock) {
             this.ip = ip;
             this.peerId = generatePeerId(this.ip, this.port);
         }
     }
 
     public int getPort() {
-        synchronized(sharedLock) {
+        synchronized(addressLock) {
             return this.port;
         }
     }
     public void setPort(int port) {
-        synchronized(sharedLock) {
+        synchronized(addressLock) {
             this.port = port;
             this.peerId = generatePeerId(this.ip, this.port);
         }
     }
 
     public Peer getPeerObject() {
-        synchronized(sharedLock) {
+        synchronized(peerLock) {
             return new Peer(this.ip, this.port, this.peerId);
         }
     }
 
     public Peer getSuccessor() {
-        synchronized(sharedLock) {
+        synchronized(peerLock) {
             return this.fingerTable[0];
         }
     }
     public void setSuccessor(Peer p) {
-        synchronized(sharedLock) {
+        synchronized(fingerTableLock) {
             this.fingerTable[0] = p;
         }
     }
 
     public Peer getPredecessor() {
-        synchronized(sharedLock) {
+        synchronized(peerLock) {
             return this.predecessor;
         }
     }
     public void setPredecessor(Peer p) {
-        synchronized(sharedLock) {
+        synchronized(peerLock) {
             this.predecessor = p; 
         }
     }
 
     public Peer[] getFingerTable() {
-        synchronized(sharedLock) {
+        synchronized(fingerTableLock) {
             return this.fingerTable;
         }
     }
     public void updateFingerTable(Peer[] fingerTable) {
-        synchronized(sharedLock){
+        synchronized(fingerTableLock){
             this.fingerTable = fingerTable; 
         }
     }
     public void updateFingerTable(Peer peer, int index) {
-        synchronized(sharedLock) {
+        synchronized(fingerTableLock) {
             this.fingerTable[index] = peer;
         }
     }
 
     public Map<String, PeerData> getPeerFiles() {
-        synchronized(sharedLock) {
+        synchronized(peerFilesLock) {
             return this.peerFiles;
         }
     }
     public PeerData getPeerData(long key) {
-        synchronized(sharedLock) {
+        synchronized(peerFilesLock) {
             return this.peerFiles.get(Long.toString(key));
         }
     }
     public void addPeerFile(PeerData data) {
         String strKey = Long.toString(data.getKey());
-        synchronized(sharedLock) {
+        synchronized(peerFilesLock) {
             this.peerFiles.put(strKey, data);
         }
     }
 
     public Map<String, FileInfo> getMyFiles() {
-        synchronized(sharedLock) {
+        synchronized(myFilesLock) {
             return this.myFiles;
         }
     }
     public void addFile(FileInfo file) {
-        synchronized(sharedLock) {
+        synchronized(myFilesLock) {
             this.myFiles.put(file.getFilename(), file);
         }
     }
