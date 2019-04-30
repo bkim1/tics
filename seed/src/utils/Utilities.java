@@ -2,7 +2,11 @@ package utils;
 
 import static utils.Constants.RING_SIZE;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -27,6 +31,21 @@ public class Utilities {
 			}
 			//if we reach a node whose successor's key is larger than the file hash, we return the successor
 			else if(msg.getKey() > finger.getKey() && i+1 < length && fingerTable[i+1].getKey() > msg.getKey()) {
+				try {
+					Peer next = fingerTable[i+1];
+					InetAddress address = next.getIP();
+					int port = next.getPort();
+					Socket socket = new Socket(address, port);
+					OutputStream os = socket.getOutputStream(); 
+					ObjectOutputStream oos = new ObjectOutputStream(os);
+					oos.flush();
+					oos.writeObject(msg);   //send object to server
+					oos.flush();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				return fingerTable[i+1];
 			}
 		}
