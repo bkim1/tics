@@ -117,11 +117,28 @@ public class Node {
         synchronized(fingerTableLock){
             this.fingerTable = fingerTable; 
         }
+        System.out.println("Finger Table has been updated!");
+        System.out.println("Updated version: ");
+        System.out.println(this.printFingerTable() + "\n");
     }
     public void updateFingerTable(Peer peer, int index) {
         synchronized(fingerTableLock) {
             this.fingerTable[index] = peer;
         }
+        System.out.println("Finger Table has been updated!");
+        System.out.println("Updated version: ");
+        System.out.println(this.printFingerTable() + "\n");
+    }
+
+    public String printFingerTable() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("i\t| Peer\n");
+        sb.append("-------------------------\n");
+        for (int i = 0; i < this.fingerTable.length; i++) {
+            sb.append(Integer.toString(i) + "\t| " + this.fingerTable[i].toString() + "\n");
+        }
+
+        return sb.toString();
     }
 
     public Map<String, PeerData> getPeerFiles() {
