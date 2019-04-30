@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import static utils.Constants.RING_SIZE;
+import static utils.Utilities.objToString;
 
 public class DataShard {
     private long key;
@@ -49,4 +50,6 @@ public class DataShard {
     public String getFilename() { return this.filename; }
 
     public String getHashedData() { return this.hashedData; }
+
+    public String toString() { return objToString(this); }
 }

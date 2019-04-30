@@ -13,6 +13,7 @@ import java.util.List;
 import object.DataShard;
 import static utils.Constants.RING_SIZE;
 import static utils.Constants.SALT_SIZE;
+import static utils.Utilities.objToString;
 
 public class FileInfo {
     private String filename;
@@ -93,4 +94,6 @@ public class FileInfo {
     public int getNumReceived() { return this.currentReceived; }
     public void resetReceived() { this.currentReceived = 0; }
     public void incrememntReceived() { this.currentReceived++; }
+
+    public String toString() { return objToString(this); }
 }

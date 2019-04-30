@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import object.Peer;
+import static utils.Utilities.objToString;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 3258205L;
@@ -46,4 +47,6 @@ public class Message implements Serializable {
 
     public List<Peer> getUpdatedPeers() { return this.updatedPeers; }
     public void setUpdatedPeers(List<Peer> updatedPeers) { this.updatedPeers = updatedPeers; }
+
+    public String toString() { return objToString(this); }
 }

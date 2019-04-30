@@ -8,7 +8,7 @@ import object.FileInfo;
 import object.Peer;
 import object.PeerData;
 import static utils.Constants.RING_SIZE;
-import static utils.Utilities.generatePeerId;;
+import utils.Utilities;
 
 public class Node {
     private String password;
@@ -52,7 +52,7 @@ public class Node {
         synchronized(addressLock) {
             this.ip = ip;
             this.port = port;
-            this.peerId = generatePeerId(this.ip, this.port);
+            this.peerId = Utilities.generatePeerId(this.ip, this.port);
         }
     }
 
@@ -64,7 +64,7 @@ public class Node {
     public void setIP(InetAddress ip) {
         synchronized(addressLock) {
             this.ip = ip;
-            this.peerId = generatePeerId(this.ip, this.port);
+            this.peerId = Utilities.generatePeerId(this.ip, this.port);
         }
     }
 
@@ -76,7 +76,7 @@ public class Node {
     public void setPort(int port) {
         synchronized(addressLock) {
             this.port = port;
-            this.peerId = generatePeerId(this.ip, this.port);
+            this.peerId = Utilities.generatePeerId(this.ip, this.port);
         }
     }
 
@@ -168,4 +168,6 @@ public class Node {
             this.myFiles.put(file.getFilename(), file);
         }
     }
+
+    public String toString() { return Utilities.objToString(this); }
 }

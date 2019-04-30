@@ -2,6 +2,8 @@ package object;
 
 import java.io.Serializable;
 
+import static utils.Utilities.objToString;
+
 public class PeerData implements Serializable {
     private static final long serialVersionUID = 1001100L;
 
@@ -18,5 +20,6 @@ public class PeerData implements Serializable {
 
     public byte[] getData() { return this.data; }
     public void setData(byte[] data) { this.data = data; }
-    // public void setData(InputStream in) {} ?
+    
+    public String toString() { return objToString(this); }
 }
