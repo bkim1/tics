@@ -11,7 +11,7 @@ import node.Node;
 
 public class NodeController {
     private Node node;
-    private Properties applicationProps;
+    private Properties userProps;
     private Map<String, FileInfo> currentLookup;
     
     public NodeController(Node node) throws IOException {
@@ -24,10 +24,10 @@ public class NodeController {
         defaultProps.load(in);
         in.close();
 
-        // Setup and load application properties
-        applicationProps = new Properties(defaultProps);
-        in = new FileInputStream(".applicationProps");
-        applicationProps.load(in);
+        // Setup and load user properties on top of defaults
+        userProps = new Properties(defaultProps);
+        in = new FileInputStream(".userProps");
+        userProps.load(in);
         in.close();
     }
 
@@ -43,11 +43,11 @@ public class NodeController {
     }
 
     public String getDownloadLoc() {
-        return this.applicationProps.getProperty("downloadFileLoc");
+        return this.userProps.getProperty("downloadFileLoc");
     }
 
-    public String getSaveLoc() {
-        return this.applicationProps.getProperty("saveStateLoc");
+    public String getSaveStateLoc() {
+        return this.userProps.getProperty("saveStateLoc");
     }
 
     public Peer getPeerObject() {

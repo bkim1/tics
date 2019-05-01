@@ -21,7 +21,7 @@ public class SaveRunnable implements Runnable {
     }
 
     public void run() {
-        String saveLoc = this.nc.getSaveLoc();
+        String saveLoc = this.nc.getSaveStateLoc();
         File saveFile = new File(saveLoc);
         
         try {
