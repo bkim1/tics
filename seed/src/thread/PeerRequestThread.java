@@ -73,13 +73,13 @@ public class PeerRequestThread implements Runnable {
 	}
 
 	public void join() {
-		long key = msg.getKey();
+		//long key = msg.getKey();
 		Peer finger = msg.getFinger();
 		//if the finger does not equal the current node, then the finger is an entry of the
 		//current node's finger table
 		if(!finger.equals(node.getPeerObject())) {
 			int index = msg.getFingerIndex();
-			node.updateTableEntry(msg.getFingerIndex(), finger);
+			node.updateFingerTable(finger, msg.getFingerIndex());
 			System.out.println("Finger table entry at index " + index + " updated to " + finger.getIP() + ".");
 		}
 		//if getFound() is true, then the current node is the target node
