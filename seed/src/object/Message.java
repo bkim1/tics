@@ -1,7 +1,6 @@
 package object;
 
 import java.io.Serializable;
-import java.util.List;
 
 import object.Peer;
 import static utils.Utilities.objToString;
@@ -13,7 +12,7 @@ public class Message implements Serializable {
     private long key;
     private byte[] data;
     private Peer peer;
-    private List<Peer> updatedPeers;
+    private Peer[] updatedPeers;
 
     public Message(ReqType msgType, Peer peer, long key, byte[] data) {
         this.msgType = msgType;
@@ -27,7 +26,7 @@ public class Message implements Serializable {
         this.peer = peer;
     }
     
-    public Message(ReqType msgType, Peer peer, List<Peer> updatedPeers) {
+    public Message(ReqType msgType, Peer peer, Peer[] updatedPeers) {
         this.msgType = msgType;
         this.peer = peer;
         this.updatedPeers = updatedPeers;
@@ -45,8 +44,8 @@ public class Message implements Serializable {
     public Peer getPeer() { return this.peer; }
     public void setPeer(Peer peer) { this.peer = peer; }
 
-    public List<Peer> getUpdatedPeers() { return this.updatedPeers; }
-    public void setUpdatedPeers(List<Peer> updatedPeers) { this.updatedPeers = updatedPeers; }
+    public Peer[] getUpdatedPeers() { return this.updatedPeers; }
+    public void setUpdatedPeers(Peer[] updatedPeers) { this.updatedPeers = updatedPeers; }
 
     public String toString() { return objToString(this); }
 }
