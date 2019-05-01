@@ -1,6 +1,7 @@
 package object;
 
 import java.io.File;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -15,7 +16,9 @@ import static utils.Constants.RING_SIZE;
 import static utils.Constants.SALT_SIZE;
 import static utils.Utilities.objToString;
 
-public class FileInfo {
+public class FileInfo implements Serializable {
+    private static final long serialVersionUID = 25802301L;
+
     private String filename;
     private List<DataShard> shardHashes;
     private byte[] salt;
