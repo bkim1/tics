@@ -39,7 +39,6 @@ public class UserRequestThread implements Runnable {
             break;
             case 4: leaveNetwork();
             break;
-            
             default: System.out.println("Please enter a valid input, an int between 1 and 4");
             break;
         }
@@ -47,9 +46,7 @@ public class UserRequestThread implements Runnable {
 
     public void upload(){ //using lookup method, forward along appropriately
         System.out.println("Enter the full local address of the file you wish to upload");
-        String newFileLocation;
-        newFileLocation = input.nextLine();
-        String userChoice = newFileLocation;
+        String newFileLocation = input.nextLine();
         int index = newFileLocation.lastIndexOf("/");
         if (index == newFileLocation.length()-1) {
             index = newFileLocation.lastIndexOf("/", index);
@@ -57,8 +54,8 @@ public class UserRequestThread implements Runnable {
         String newFileName = newFileLocation.substring(index + 1);
         //generate a key for the file using the newFileName
         FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName);
-        Message msg = new Message(ReqType.UPLOAD);
-        msg.setKey(newFileInfo.getKey());
+        Peer peer = this.nc.getPeerObject();
+        Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
         Utilities.lookUp(msg, this.node.getFingerTable());
     }
 
