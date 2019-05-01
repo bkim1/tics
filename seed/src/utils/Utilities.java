@@ -118,7 +118,8 @@ public class Utilities {
 		for(int i = 0; i < init.length; i++) {
 			long targetKey = peerID + (long) Math.pow(2, i);
 			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
-			Peer next = lookUp(msg, init, peerID);
+			msg.setFingerIndex(i);
+			lookUp(msg, init, peerID);
 			System.out.println("Searching for " + i + "th entry in finger table...");
 		}
 	}
