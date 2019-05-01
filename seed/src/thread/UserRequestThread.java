@@ -28,18 +28,22 @@ public class UserRequestThread implements Runnable {
         while (true) {
             System.out.println("Enter 1 for file upload, 2 for file retrieval, 3 for changing default directory, and 4 for Leaving Network");
             Scanner userScan = new Scanner(System.in);
-            int UsrIn = userScan.nextInt();
-            switch (UsrIn) {
-                case 1: upload();
-                break;
-            // case 2: initializeLookupRequest();
-            // break;
-                case 3: changeDefaultDownloadDirectory();
-                break;
-                case 4: leaveNetwork();
-                break;
-                default: System.out.println("Please enter a valid input, an int between 1 and 4");
-                break;
+            try {
+                int UsrIn = userScan.nextInt();
+                switch (UsrIn) {
+                    case 1: upload();
+                    break;
+                    case 2: initializeLookupRequest();
+                    break;
+                    case 3: changeDefaultDownloadDirectory();
+                    break;
+                    case 4: leaveNetwork();
+                    break;
+                    default: System.out.println("Please enter a valid input, an int between 1 and 4");
+                    break;
+                }
+            } catch (Exception e) {
+                //TODO: handle exception
             }
         }
 	}
@@ -53,7 +57,6 @@ public class UserRequestThread implements Runnable {
             index = newFileLocation.lastIndexOf("/", index);
         }
         String newFileName = newFileLocation.substring(index + 1);
-        //generate a key for the file using the newFileName
         FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName); //register file info in nodecontroller
         Peer peer = this.nc.getPeerObject();
         Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
@@ -73,10 +76,9 @@ public class UserRequestThread implements Runnable {
         Message msg = new Message(ReqType.LOOKUP, peer, requestFileInfo.getKey());
         Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
     }
-    //lookup with getmyfiles
 
     public void changeDefaultDownloadDirectory(){
-
+        
     }
 
     public void leaveNetwork(){
