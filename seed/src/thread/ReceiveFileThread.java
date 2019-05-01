@@ -14,16 +14,12 @@ import node.*;
 public class ReceiveFileThread implements Runnable {
     private Message msg;
     private NodeController nc;
-    private Node node;
-    private Peer peer;
     private Socket socket;
     private InputStream inputStream;
 
     public ReceiveFileThread(Message msg, NodeController nc, Socket peerSocket) throws IOException {
         this.msg = msg;
         this.nc = nc;
-        this.node = this.nc.getNode();
-        this.peer = msg.getPeer();
         this.socket = peerSocket;
         this.inputStream = this.socket.getInputStream();
     }
