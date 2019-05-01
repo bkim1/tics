@@ -112,33 +112,15 @@ public class Utilities {
 
 		return result.toString();
 	}
-
-	public String getContents(String fileName) {
-		StringBuffer buff = new StringBuffer();
-		try {
-			File openFile = new File(fileName);
-			File f = new File(fileName);
-			if (f.isFile()) {
-				int c = 0;
-				System.out.println("file: " + fileName + " exits");
-				Scanner inFile = new Scanner(openFile);
-				while (inFile.hasNext()) {
-					String line = inFile.nextLine();
-					//System.out.println(line);
-					buff.append(line);
-					buff.append("\n");
-					c++;
-				}
-				System.out.println("processed "+c+" lines");
-				inFile.close();
-				return buff.toString();
-			}
-			else {
-				System.out.println("file: " + fileName + " does NOT exit");
-			}
-		} catch (Exception e) {
+	
+	public void generateFingerTable(Peer[] init, Peer sender) {
+		long peerID = sender.getKey();
+		for(int i = 0; i < init.length; i++) {
+			long targetKey = peerID + (long) Math.pow(2, i);
+			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
+			Peer next = lookUp(msg, init, peerID);
+			System.out.println("Searching for " + i + "th entry in finger table...");
 		}
-		return null;
 	}
 
 }
