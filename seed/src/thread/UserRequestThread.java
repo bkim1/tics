@@ -16,11 +16,13 @@ public class UserRequestThread implements Runnable {
     private Message msg;
     private NodeController nc;
     private Peer peer;
+    private Node node;
 
-    public UserRequestThread(Message msg, NodeController nc) {
+    public UserRequestThread(Message msg, NodeController nc, Node n) {
         this.msg = msg;
         this.nc = nc;
         this.peer = msg.getPeer();
+        this.node = n;
     }
     
 	public void run() {
@@ -31,44 +33,33 @@ public class UserRequestThread implements Runnable {
         switch (userChoice) {
             case 1: upload();
             break;
-            case 2: initializeLookupRequest(key);
+            case 2: initializeLookupRequest();
             break;
             case 3: changeDefaultDownloadDirectory();
             break;
             case 4: leaveNetwork();
             break;
-            
             default: System.out.println("Please enter a valid input, an int between 1 and 4");
             break;
         }
-
-		switch(msg.getReqType()) {
-		case LOOKUP:
-			//initializeLookupRequest();
-            break;
-        case UPLOAD:
-            upload();
-            break;
-		}
 	}
 
     public void upload(){ //using lookup method, forward along appropriately
         System.out.println("Enter the full local address of the file you wish to upload");
-        String newFileLocation;
-        newFileLocation = input.nextLine();
-        String userChoice = newFileLocation;
+        String newFileLocation = input.nextLine();
         int index = newFileLocation.lastIndexOf("/");
         if (index == newFileLocation.length()-1) {
             index = newFileLocation.lastIndexOf("/", index);
         }
         String newFileName = newFileLocation.substring(index + 1);
-
-        String fileContents = getContents(userChoice);
-        new FileInfo(fileLoc, filename)
-
+        //generate a key for the file using the newFileName
+        FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName);
+        Peer peer = this.nc.getPeerObject();
+        Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
+        Utilities.lookUp(msg, this.node.getFingerTable());
     }
 
-    public void initializeLookupRequest(Long key){
+    public void initializeLookupRequest(){
         System.out.println("Enter the name of the file you wish to retrieve");
         String requestedFileName;
         requestedFileName = input.nextLine();
