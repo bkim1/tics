@@ -1,15 +1,21 @@
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import node.*;
 import object.Message;
 import object.ReqType;
+import object.SaveState;
 import thread.*;
+import utils.SaveRunnable;
 
 
 public class Server {
@@ -25,17 +31,16 @@ public class Server {
         this.node = new Node(InetAddress.getLocalHost(), this.port);
         this.nc = new NodeController(node);
 
-        InitializeThread iThread = new InitializeThread(this.node);
-        Thread t = new Thread(iThread);
-        t.start();
-        t.join();
+        // Restore previous state if any
+        boolean isRestored = this.restoreStateIfNecessary();
 
-        // UserRequestThread uThread = new UserRequestThread();
-        // t = new Thread(uThread);
-        // t.start();
-
-        // this.stabilizeThread = new StabilizeThread(this.node, this.nc);
-        // t = new Thread(sThread);
+        this.initializeThreads(isRestored);
+        
+        // Add continuous execution of save state
+        Runnable saveRunnable = new SaveRunnable(this.node, this.nc);
+        ScheduledThreadPoolExecutor schedExec = new ScheduledThreadPoolExecutor(1);
+        schedExec.scheduleAtFixedRate(saveRunnable, 5, 5, TimeUnit.MINUTES);
+        Runtime.getRuntime().addShutdownHook(new Thread(saveRunnable));
     }
 
     public void run() throws IOException {
@@ -86,6 +91,55 @@ public class Server {
                 return;
         }
         t.start();
+    }
+
+    private boolean restoreStateIfNecessary() {
+        SaveState prevState = null;
+        String saveLoc = this.nc.getSaveLoc();
+        File saveFile = new File(saveLoc);
+        boolean isRestored = false;
+
+        try {
+            saveFile.createNewFile();
+
+            FileInputStream myFileInputStream = new FileInputStream(saveFile);
+            ObjectInputStream objInputStream = new ObjectInputStream(myFileInputStream);
+            prevState = (SaveState) objInputStream.readObject(); 
+            objInputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (prevState != null && 
+            this.node.getIP().equals(prevState.getIP()) &&
+            this.node.getPort() == prevState.getPort()) {
+            
+            prevState.restorePreviousState(this.node);
+            isRestored = true;
+        }
+
+        return isRestored;
+    }
+
+    private void initializeThreads(boolean isRestored) {
+        try {
+            if (!isRestored) {
+                InitializeThread iThread = new InitializeThread(this.node);
+                Thread t = new Thread(iThread);
+                t.start();
+                t.join();
+            }
+    
+            // UserRequestThread uThread = new UserRequestThread();
+            // Thread t1 = new Thread(uThread);
+            // t.start();
+    
+            // this.stabilizeThread = new StabilizeThread(this.node, this.nc);
+            // Thread t2 = new Thread(sThread);
+            // t2.start();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {

@@ -39,15 +39,15 @@ public class NodeController {
     }
 
     public FileInfo getLookupFileInfo(long key) {
-        return this.currentLookup.get(Long.toString(key));
+        return this.currentLookup.getOrDefault(Long.toString(key), null);
     }
 
     public String getDownloadLoc() {
-        return this.applicationProps.getProperty("downloadLoc");
+        return this.applicationProps.getProperty("downloadFileLoc");
     }
 
     public String getSaveLoc() {
-        return this.applicationProps.getProperty("saveLoc");
+        return this.applicationProps.getProperty("saveStateLoc");
     }
 
     public Peer getPeerObject() {

@@ -3,6 +3,7 @@ package object;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -13,7 +14,9 @@ import java.util.Base64;
 import static utils.Constants.RING_SIZE;
 import static utils.Utilities.objToString;
 
-public class DataShard {
+public class DataShard implements Serializable {
+    private static final long serialVersionUID = 674850213L;
+
     private long key;
     private String filename;
     private String hashedData;

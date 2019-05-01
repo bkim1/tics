@@ -42,6 +42,8 @@ public class InitializeThread implements Runnable {
         this.node.printFingerTable();
 
         // Call Rocky's Utility function
+
+        // Use newly updated fingerTable to send JOIN msg to affected range
     }
 
     private Peer[] getInitialFingerTable() {

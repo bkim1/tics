@@ -152,6 +152,12 @@ public class Node {
         }
     }
 
+    public void setPeerFiles(Map<String, PeerData> peerFiles) { 
+        synchronized(peerFilesLock) {
+            this.peerFiles = peerFiles;
+        }
+    }
+
     public Map<String, FileInfo> getMyFiles() {
         synchronized(myFilesLock) {
             return this.myFiles;
@@ -172,6 +178,12 @@ public class Node {
     public FileInfo getFileInfo(String filename) {
         synchronized(myFilesLock) {
             return this.myFiles.getOrDefault(filename, null);
+        }
+    }
+
+    public void setMyFiles(Map<String, FileInfo> myFiles) {
+        synchronized(myFilesLock) {
+            this.myFiles = myFiles;
         }
     }
 
