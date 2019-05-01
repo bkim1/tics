@@ -25,20 +25,22 @@ public class UserRequestThread implements Runnable {
     }
     
 	public void run() {
-        System.out.println("Enter 1 for file upload, 2 for file retrieval, 3 for changing default directory, and 4 for Leaving Network");
-        Scanner userScan = new Scanner(System.in);
-        int UsrIn = userScan.nextInt();
-        switch (UsrIn) {
-            case 1: upload();
-            break;
+        while (true) {
+            System.out.println("Enter 1 for file upload, 2 for file retrieval, 3 for changing default directory, and 4 for Leaving Network");
+            Scanner userScan = new Scanner(System.in);
+            int UsrIn = userScan.nextInt();
+            switch (UsrIn) {
+                case 1: upload();
+                break;
             // case 2: initializeLookupRequest();
             // break;
-            case 3: changeDefaultDownloadDirectory();
-            break;
-            case 4: leaveNetwork();
-            break;
-            default: System.out.println("Please enter a valid input, an int between 1 and 4");
-            break;
+                case 3: changeDefaultDownloadDirectory();
+                break;
+                case 4: leaveNetwork();
+                break;
+                default: System.out.println("Please enter a valid input, an int between 1 and 4");
+                break;
+            }
         }
 	}
 
@@ -63,17 +65,13 @@ public class UserRequestThread implements Runnable {
         Scanner retrieveScan = new Scanner(System.in);
         String requestedFileName = retrieveScan.nextLine();
         Peer peer = this.nc.getPeerObject();
-        FileInfo requestFileInfo = this.nc.getRegisteredFileInfo(requestedFileName);
+        FileInfo requestFileInfo = this.nc.getRegisteredFileInfo(requestedFileName); //check if obj is null, bc then lookup can't proceed
+        if (requestFileInfo == null) {
+            System.out.println("Not a registered file. Please try again");
+            return;
+        }
         Message msg = new Message(ReqType.LOOKUP, peer, requestFileInfo.getKey());
         Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
-
-        //first check if it is currently a file that i've actually uploaded
-        //nodes myfiles myfiles.contains    to get the actual fileinfo obj for the lookup, use 
-        //go through nodecontroller though
-        //where i will look at 
-
-        //check if it is in myFiles
-
     }
     //lookup with getmyfiles
 
