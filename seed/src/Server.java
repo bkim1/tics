@@ -48,49 +48,13 @@ public class Server {
             while (true) {
                 Socket peerSocket = this.serverSocket.accept();
 
-                Message msg = this.getMessage(peerSocket);
-                this.forwardMessage(msg, peerSocket);
+                new Thread(
+                    new ForwardRequestThread(this.node, this.nc, peerSocket)
+                ).start();
             }
-        } catch(IOException | ClassNotFoundException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
-    }
-    
-    private Message getMessage(Socket peerSocket) throws IOException, ClassNotFoundException {
-        ObjectInputStream in = new ObjectInputStream(peerSocket.getInputStream());
-        Message msg = (Message) in.readObject();
-        in.close();
-        return msg;
-    }
-
-    private void forwardMessage(Message msg, Socket peerSocket) throws IOException {
-        Thread t;
-        
-        switch(msg.getReqType()) {
-            case JOIN: case LOOKUP: case UPLOAD:
-                PeerRequestThread prThread = new PeerRequestThread(msg, this.node);
-                t = new Thread(prThread);
-                peerSocket.close();
-                break;
-            case SEND:
-                ReceiveFileThread rfThread = new ReceiveFileThread(msg, this.nc, peerSocket);
-                t = new Thread(rfThread);
-                break;
-            case STABILIZE: case STABILIZE_PRED_RESP: case STABILIZE_PRED_REQ:
-                // this.stabilizeThread.request(msg);
-                t = new Thread();
-                peerSocket.close();
-                break;
-            case SETUP:
-                SetupRequestThread sThread = new SetupRequestThread(this.node, peerSocket);
-                t = new Thread(sThread);
-                break;
-            default:
-                System.out.println("Unknown ReqType... Closing socket.");
-                peerSocket.close();
-                return;
-        }
-        t.start();
     }
 
     private boolean restoreStateIfNecessary() {
