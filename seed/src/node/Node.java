@@ -40,7 +40,6 @@ public class Node {
             return this.password;
         }
     }
-    private void generateKey() {}
 
     public long getPeerId() {
         synchronized(addressLock) {
@@ -115,22 +114,24 @@ public class Node {
     }
     public void updateFingerTable(Peer[] fingerTable) {
         synchronized(fingerTableLock){
-            this.fingerTable = fingerTable; 
+            this.fingerTable = fingerTable;
+
+            System.out.println("Finger Table has been updated!");
+            System.out.println("Updated version: ");
+            this.printFingerTable();
         }
-        System.out.println("Finger Table has been updated!");
-        System.out.println("Updated version: ");
-        System.out.println(this.printFingerTable() + "\n");
     }
     public void updateFingerTable(Peer peer, int index) {
         synchronized(fingerTableLock) {
             this.fingerTable[index] = peer;
+
+            System.out.println("Finger Table has been updated!");
+            System.out.println("Updated version: ");
+            this.printFingerTable();
         }
-        System.out.println("Finger Table has been updated!");
-        System.out.println("Updated version: ");
-        System.out.println(this.printFingerTable() + "\n");
     }
 
-    public String printFingerTable() {
+    public void printFingerTable() {
         StringBuilder sb = new StringBuilder();
         sb.append("i\t| Peer\n");
         sb.append("-------------------------\n");
@@ -138,7 +139,7 @@ public class Node {
             sb.append(Integer.toString(i) + "\t| " + this.fingerTable[i].toString() + "\n");
         }
 
-        return sb.toString();
+        System.out.println(sb.toString() + "\n");
     }
 
     public Map<String, PeerData> getPeerFiles() {
