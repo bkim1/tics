@@ -12,6 +12,8 @@ public class Message implements Serializable {
     private long key;
     private byte[] data;
     private Peer peer;
+    private Peer finger;
+    private int fingerIndex;
     private Peer[] updatedPeers;
     private boolean isFound = false;
 
@@ -39,6 +41,12 @@ public class Message implements Serializable {
         this.key = Key;
     }
 
+    public Peer getFinger() { return this.finger; }
+    public void setFinger(Peer finger) { this.finger = finger; }
+    
+    public int getFingerIndex() { return this.fingerIndex; }
+    public void setFingerIndex(int index) { this.fingerIndex = index; }
+    
     public ReqType getReqType() { return this.msgType; }
     public void setReqType(ReqType rt) { this.msgType = rt; }
 
