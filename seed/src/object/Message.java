@@ -33,6 +33,12 @@ public class Message implements Serializable {
         this.updatedPeers = updatedPeers;
     }
 
+    public Message(ReqType msgType, Peer peer, long Key) {
+        this.msgType = msgType;
+        this.peer = peer;
+        this.key = Key;
+    }
+
     public ReqType getReqType() { return this.msgType; }
     public void setReqType(ReqType rt) { this.msgType = rt; }
 
@@ -44,9 +50,10 @@ public class Message implements Serializable {
 
     public Peer getPeer() { return this.peer; }
     public void setPeer(Peer peer) { this.peer = peer; }
-    
+
     public void setFound() { this.isFound = true; }
     public boolean getFound() { return this.isFound; }
+
 
     public Peer[] getUpdatedPeers() { return this.updatedPeers; }
     public void setUpdatedPeers(Peer[] updatedPeers) { this.updatedPeers = updatedPeers; }
