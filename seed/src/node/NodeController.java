@@ -33,37 +33,37 @@ public class NodeController {
 
     public Node getNode() { return this.node; }
 
-    public synchronized void addLookup(long key, FileInfo info) {
+    public void addLookup(long key, FileInfo info) {
         String strKey = Long.toString(key);
         this.currentLookup.put(strKey, info);
     }
 
-    public synchronized FileInfo getFileInfo(long key) {
+    public FileInfo getFileInfo(long key) {
         return this.currentLookup.get(Long.toString(key));
     }
 
-    public synchronized String getDownloadLoc() {
+    public String getDownloadLoc() {
         return this.applicationProps.getProperty("downloadLoc");
     }
 
-    public synchronized Peer getPeerObject() {
+    public Peer getPeerObject() {
         // ip, port, key
         return new Peer(this.node.getIP(), this.node.getPort(), this.node.getPeerId());
     }
     
-    public synchronized Peer[] getFingerTables() {
+    public Peer[] getFingerTables() {
         return this.node.getFingerTable();
     }
     
-    public synchronized PeerData getPeerFiles(long key) {
+    public PeerData getPeerFiles(long key) {
         return this.node.getPeerData(key);
     }
 
-    public synchronized Peer getSuccessor() {
-        return this.node.getFingerTable()[0];
+    public Peer getSuccessor() {
+        return this.node.getSuccessor();
     }
 
-    public synchronized String getFilename(long key) {
+    public String getFilename(long key) {
         String strKey = Long.toString(key);
         FileInfo info = this.currentLookup.get(strKey);
 
