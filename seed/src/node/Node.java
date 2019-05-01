@@ -11,7 +11,6 @@ import static utils.Constants.RING_SIZE;
 import utils.Utilities;
 
 public class Node {
-    private String password;
     private long peerId;
     private InetAddress ip;
     private int port;
@@ -33,12 +32,6 @@ public class Node {
         this.fingerTable = new Peer[RING_SIZE];
         this.peerFiles = new HashMap<>();
         this.myFiles = new HashMap<>();
-    }
-
-    public String getKey() {
-        synchronized(addressLock) {
-            return this.password;
-        }
     }
 
     public long getPeerId() {
