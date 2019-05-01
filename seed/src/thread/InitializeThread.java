@@ -2,33 +2,28 @@ package thread;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Random;
 
 import node.Node;
 import object.Message;
 import object.Peer;
 import object.ReqType;
 
-import static utils.Constants.MIN_PORT;
-import static utils.Constants.MAX_PORT;
 import static utils.Constants.ENTRY_ADDRESS;
 import static utils.Constants.ENTRY_PORT;
 
+
 public class InitializeThread implements Runnable {
     private Node node;
-    private int port;
     private Socket socket;
     private InputStream inputStream;
     private OutputStream outputStream;
     
-
     public InitializeThread(Node node) {
         this.node = node;
-        Random random = new Random();
-        this.port = random.nextInt((MAX_PORT - MIN_PORT) + 1) + MIN_PORT;
 
         try {
             this.socket = new Socket(ENTRY_ADDRESS, ENTRY_PORT);
@@ -43,13 +38,51 @@ public class InitializeThread implements Runnable {
         System.out.println("Attempting to enter network");
         Peer[] initTable = this.getInitialFingerTable();
 
+        this.node.updateFingerTable(initTable);
+        this.node.printFingerTable();
+
+        // Call Rocky's Utility function
     }
 
     private Peer[] getInitialFingerTable() {
-        // USE SETUP REQTYPE
+        Peer[] initFingerTable = null;
         Message setupMsg = new Message(ReqType.SETUP, this.node.getPeerObject());
 
+        try {
+            // Send SETUP request message to entry point
+            ObjectOutputStream objOutputStream = new ObjectOutputStream(this.outputStream);
+            objOutputStream.flush();
+            objOutputStream.writeObject(setupMsg);
+            objOutputStream.flush();
 
-        return new Peer[5];
+            // Get SETUP_RESP message from entry point
+            int numRetry = 0;
+            Message setupResp = null;
+            ObjectInputStream objInputStream = new ObjectInputStream(this.inputStream);
+
+            while (numRetry < 3) {
+                setupResp = (Message) objInputStream.readObject();
+
+                if (setupResp.getReqType() == ReqType.SETUP_RESP) { break; }
+                
+                // Else resend message after waiting 100ms
+                Thread.sleep(100);
+                objOutputStream.flush();
+                objOutputStream.writeObject(setupMsg);
+                objOutputStream.flush();
+                numRetry++;
+            }
+
+            if (numRetry == 3) {
+                System.out.println("Couldn't establish connection with entry point" +
+                                   "... Please try again later");
+                System.exit(0);
+            }
+            initFingerTable = setupResp.getUpdatedPeers();
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return initFingerTable;
     }
 }

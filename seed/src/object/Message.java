@@ -13,6 +13,7 @@ public class Message implements Serializable {
     private byte[] data;
     private Peer peer;
     private Peer[] updatedPeers;
+    private boolean isFound = false;
 
     public Message(ReqType msgType, Peer peer, long key, byte[] data) {
         this.msgType = msgType;
@@ -43,6 +44,9 @@ public class Message implements Serializable {
 
     public Peer getPeer() { return this.peer; }
     public void setPeer(Peer peer) { this.peer = peer; }
+    
+    public void setFound() { this.isFound = true; }
+    public boolean getFound() { return this.isFound; }
 
     public Peer[] getUpdatedPeers() { return this.updatedPeers; }
     public void setUpdatedPeers(Peer[] updatedPeers) { this.updatedPeers = updatedPeers; }
