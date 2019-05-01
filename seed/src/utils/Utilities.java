@@ -17,37 +17,44 @@ import object.*;
 
 public class Utilities {
 
-	public static Peer lookUp(Message msg, Peer[] fingerTable) {
+	public static Peer lookUp(Message msg, Peer[] fingerTable, long selfKey) {
 		Peer finger = null;
 		int length = fingerTable.length;
+		
 		for(int i = 0; i < length; i++) {
 			finger = fingerTable[i];
-			
+			long nodeKey = finger.getKey();
+			long targetKey = msg.getKey();
+			/*
 			if(finger.equals(msg.getPeer())) {
 				return null;
+			}*/
+			
+			if(nodeKey == targetKey || 
+			   (i == 0 && selfKey < nodeKey && nodeKey < targetKey)) {
+				msg.setFound();
+				break;
 			}
-			else if(msg.getKey() == finger.getKey()) {
-				return finger;
-			}
+			
 			//if we reach a node whose successor's key is larger than the file hash, we return the successor
 			else if(msg.getKey() > finger.getKey() && i+1 < length && fingerTable[i+1].getKey() > msg.getKey()) {
-				try {
-					Peer next = fingerTable[i+1];
-					InetAddress address = next.getIP();
-					int port = next.getPort();
-					Socket socket = new Socket(address, port);
-					OutputStream os = socket.getOutputStream(); 
-					ObjectOutputStream oos = new ObjectOutputStream(os);
-					oos.flush();
-					oos.writeObject(msg);   //send object to server
-					oos.flush();
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				return fingerTable[i+1];
-			}
+				break;
+			}	
+		}
+		try {
+			Peer next = finger;
+			InetAddress address = next.getIP();
+			int port = next.getPort();
+			Socket socket = new Socket(address, port);
+			OutputStream os = socket.getOutputStream(); 
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+			oos.flush();
+			oos.writeObject(msg);   //send object to server
+			oos.flush();
+				
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return finger;
 	}
