@@ -7,21 +7,24 @@ public class StabilizeThread implements Runnable {
     private Message msg;
     private NodeController nc;
 
-    public StabilizeThread(Message msg, NodeController nc) {
-        this.msg = msg;
+    public StabilizeThread(NodeController nc) {
         this.nc = nc;
     }
     
     public void run() {
-        switch (this.msg.getReqType()) {
+        console.log("Stabilize Thread starting...");
+    }
+
+    public void executeMsg(Message msg) {
+        switch (msg.getReqType()) {
             case STABILIZE:
                 stabilzeInit();
                 break;
             case STABILIZE_PRED_RESP:
-                handleStabilizeResp();
+                handleStabilizeResp(msg);
                 break;
             case STABILIZE_PRED_REQ:
-                handleStabilzeReq();
+                handleStabilzeReq(msg);
             default:
                 break;
         }
@@ -34,8 +37,8 @@ public class StabilizeThread implements Runnable {
         // Wait for response
     }
 
-    private void handleStabilizeResp() {
-        Message resp = new Message("STABILIZE_PRED_RESP", suc); // this should actually come in as this.msg
+    private void handleStabilizeResp(Message resp) {
+        //Message resp = new Message("STABILIZE_PRED_RESP", suc); // this should actually come in as this.msg
         Peer sucPred = resp.getPeer();
         if (sucPred.getKey() > this.nc.getKey()) {     // successor's listed predecessor is btw this node and successor
             this.nc.setSuccessor(sucPred);      // set successor's new predecessor as node's new successor
@@ -44,8 +47,8 @@ public class StabilizeThread implements Runnable {
         }
     }
 
-    private void handleStabilzeReq() {
-        Peer sender = this.msg.getPeer();
+    private void handleStabilzeReq(Message msg) {
+        Peer sender = msg.getPeer();
         Peer pred = this.nc.getPredecessor();
         if (!pred || sender.getKey() > pred.getKey()) {  // sender is closer to node than the listed predecessor
             this.nc.setPredecessor(sender);     // set sender as node's new predecessor
@@ -57,7 +60,7 @@ public class StabilizeThread implements Runnable {
     private void fixFingers() {
         List<Peer> fingerTable = this.nc.getFingerTable();
         Random rand = new Random();
-        int i = rand.nextInt(fingerTable.size()-1) + 1  // +1 b/c don't want to pick 0 which is successor
+        int i = rand.nextInt(fingerTable.size()-1) + 1;  // +1 b/c don't want to pick 0 which is successor
         Peer finger = fingerTable.get(i);
         finger.node = findSuccessor(finger.start);
         fingerTable.set(i, finger);
