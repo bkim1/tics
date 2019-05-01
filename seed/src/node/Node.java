@@ -163,5 +163,17 @@ public class Node {
         }
     }
 
+    public boolean containsFile(String filename) {
+        synchronized(myFilesLock) {
+            return this.myFiles.containsKey(filename);
+        }
+    }
+
+    public FileInfo getFileInfo(String filename) {
+        synchronized(myFilesLock) {
+            return this.myFiles.getOrDefault(filename, null);
+        }
+    }
+
     public String toString() { return Utilities.objToString(this); }
 }
