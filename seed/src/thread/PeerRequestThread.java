@@ -99,7 +99,7 @@ public class PeerRequestThread implements Runnable {
 			}
 			return node.getPeerObject();
 		}
-		return Utilities.lookUp(msg, this.node.getFingerTable());
+		return Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
 	}
 	
 	

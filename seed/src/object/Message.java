@@ -46,6 +46,7 @@ public class Message implements Serializable {
     public void setPeer(Peer peer) { this.peer = peer; }
     
     public void setFound() { this.isFound = true; }
+    public boolean getFound() { return this.isFound; }
 
     public Peer[] getUpdatedPeers() { return this.updatedPeers; }
     public void setUpdatedPeers(Peer[] updatedPeers) { this.updatedPeers = updatedPeers; }
