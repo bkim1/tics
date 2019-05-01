@@ -11,8 +11,6 @@ import object.*;
 import utils.Utilities;
 import java.util.Scanner;
 
-
-
 public class UserRequestThread implements Runnable {
     private Message msg;
     private NodeController nc;
@@ -36,11 +34,11 @@ public class UserRequestThread implements Runnable {
                     break;
                     case 2: initializeLookupRequest();
                     break;
-                    case 3: changeDefaultDownloadDirectory();
-                    break;
-                    case 4: leaveNetwork();
-                    break;
-                    default: System.out.println("Please enter a valid input, an int between 1 and 4");
+                    // case 3: changeDefaultDownloadDirectory();
+                    // break;
+                    // case 4: leaveNetwork();
+                    // break;
+                    // default: System.out.println("Please enter a valid input, an int between 1 and 4");
                     break;
                 }
             } catch (InputMismatchException e) {
@@ -78,12 +76,11 @@ public class UserRequestThread implements Runnable {
         Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
     }
 
-    public void changeDefaultDownloadDirectory(){
+    // public void changeDefaultDownloadDirectory(){
         
-    }
+    // }
 
-    public void leaveNetwork(){
+    // public void leaveNetwork(){
 
-    }
-
+    // }
 }
