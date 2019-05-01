@@ -40,6 +40,7 @@ public class FileInfo implements Serializable {
     public FileInfo(String fileLoc, String filename) {
         this.filename = filename;
         this.shardHashes = new ArrayList<>();
+        this.salt = new byte[SALT_SIZE];
         this.isReceiving = false;
         this.currentReceived = 0;
 

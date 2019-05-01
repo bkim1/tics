@@ -27,11 +27,12 @@ public class Node {
 
 
     public Node(InetAddress ip, int port) {
-        this.ip = ip;
-        this.port = port;
+        this.updateAddress(ip, port);
         this.fingerTable = new Peer[RING_SIZE];
         this.peerFiles = new HashMap<>();
         this.myFiles = new HashMap<>();
+
+        System.out.println("Peer ID: " + this.peerId);
     }
 
     public long getPeerId() {
@@ -128,8 +129,21 @@ public class Node {
         StringBuilder sb = new StringBuilder();
         sb.append("i\t| Peer\n");
         sb.append("-------------------------\n");
+        if (this.fingerTable == null) {
+            sb.append("No peers");
+            System.out.println(sb.toString() + "\n");
+            return;
+        }
         for (int i = 0; i < this.fingerTable.length; i++) {
-            sb.append(Integer.toString(i) + "\t| " + this.fingerTable[i].toString() + "\n");
+            String finger;
+            if (this.fingerTable[i] == null) {
+                finger = "";
+            }
+            else {
+                finger = this.fingerTable[i].toString();
+            }
+            sb.append(Integer.toString(i) + ": " + finger + "\n");
+            sb.append("-------------------------\n");
         }
 
         System.out.println(sb.toString() + "\n");

@@ -67,6 +67,7 @@ public class Utilities {
 	
 	public static long generatePeerId(InetAddress ip, int port) {
 		long key = -1;
+		
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			digest.update(ip.toString().getBytes(Charset.forName("UTF-8")));
@@ -75,6 +76,10 @@ public class Utilities {
 			ByteBuffer buffer = ByteBuffer.wrap(bytes);
 			key = buffer.getLong();
 			
+			if (key < 0) { 
+				key = -key;
+				System.out.println(Long.toString(key));
+			}
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}

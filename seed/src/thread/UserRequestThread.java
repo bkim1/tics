@@ -1,34 +1,29 @@
 package thread;
+
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.File;
-import java.net.Socket;
+import java.io.InputStreamReader;
 import java.util.InputMismatchException;
-import java.util.List;
+import java.util.Scanner;
+
 import node.*;
 import object.*;
 import utils.Utilities;
-import java.util.Scanner;
 
 public class UserRequestThread implements Runnable {
-    private Message msg;
     private NodeController nc;
-    private Peer peer;
-    private Node node;
 
-    public UserRequestThread(Message msg, NodeController nc, Node n) {
-        this.msg = msg;
+    public UserRequestThread(NodeController nc) {
         this.nc = nc;
-        this.peer = msg.getPeer();
     }
     
 	public void run() {
         while (true) {
             System.out.println("Enter 1 for file upload, 2 for file retrieval, 3 for changing default directory, and 4 for Leaving Network");
-            Scanner userScan = new Scanner(System.in);
+            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
             try {
-                int UsrIn = userScan.nextInt();
+                int UsrIn = Integer.parseInt(input.readLine());
+                
                 switch (UsrIn) {
                     case 1: upload();
                     break;
@@ -41,7 +36,9 @@ public class UserRequestThread implements Runnable {
                     default: System.out.println("Please enter a valid input, an int between 1 and 4");
                     break;
                 }
-            } catch (InputMismatchException e) {
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid input, an int between 1 and 4");
             }
         }

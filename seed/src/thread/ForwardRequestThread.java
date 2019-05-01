@@ -21,8 +21,9 @@ public class ForwardRequestThread implements Runnable {
     private NodeController nc;
     private Socket socket;
     private InputStream inputStream;
+    private StabilizeThread stabilizeThread;
 
-    public ForwardRequestThread(Node node, NodeController nc, Socket socket) {
+    public ForwardRequestThread(Node node, NodeController nc, Socket socket, StabilizeThread stabilizeThread) {
         this.node = node;
         this.nc = nc;
         this.socket = socket;
@@ -32,13 +33,20 @@ public class ForwardRequestThread implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.stabilizeThread = stabilizeThread;
     }
 
     public void run() {
         try {
             Message msg = this.getMessage();
-            this.forwardMessage(msg);
-        } catch (IOException | ClassNotFoundException e) {
+            
+            Thread forwardThread = this.forwardMessage(msg);
+            // Wait for thread to finish up their action before closing
+            // the ForwardRequestThread
+            if (forwardThread != null) {
+                forwardThread.join();
+            }
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -51,9 +59,10 @@ public class ForwardRequestThread implements Runnable {
         return msg;
     }
 
-    private void forwardMessage(Message msg) throws IOException {
+    private Thread forwardMessage(Message msg) throws IOException {
         Thread t;
         
+        System.out.println("ForwardReq: Got " + msg.getReqType() + " request!\n");
         switch(msg.getReqType()) {
             case JOIN: case LOOKUP: case UPLOAD:
                 PeerRequestThread prThread = new PeerRequestThread(msg, this.node);
@@ -66,24 +75,19 @@ public class ForwardRequestThread implements Runnable {
                 break;
             case STABILIZE: case STABILIZE_PRED_RESP: case STABILIZE_PRED_REQ:
                 // this.stabilizeThread.request(msg);
-                t = new Thread();
                 this.socket.close();
-                break;
+                return null;
             case SETUP:
-                SetupRequestThread sThread = new SetupRequestThread(this.node, this.socket);
+                SetupRequestThread sThread = new SetupRequestThread(this.node, msg);
                 t = new Thread(sThread);
                 break;
             default:
                 System.out.println("Unknown ReqType... Closing socket.");
                 this.socket.close();
-                return;
+                return null;
         }
         t.start();
 
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        return t;
     }
 }

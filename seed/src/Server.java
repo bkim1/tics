@@ -25,16 +25,15 @@ public class Server {
     private NodeController nc;
     private StabilizeThread stabilizeThread;
 
-    public Server(int port) throws IOException, InterruptedException {
+    public Server(int port, boolean isFirst) throws IOException, InterruptedException {
         this.port = port;
         this.serverSocket = new ServerSocket(this.port);
         this.node = new Node(InetAddress.getLocalHost(), this.port);
         this.nc = new NodeController(node);
 
-        // Restore previous state if any
-        boolean isRestored = this.restoreStateIfNecessary();
-
-        this.initializeThreads(isRestored);
+        // Restore previous state if any and initialize threads
+        // boolean isRestored = this.restoreStateIfNecessary();
+        this.initializeThreads(false, isFirst);
         
         // Add continuous execution of save state
         Runnable saveRunnable = new SaveRunnable(this.node, this.nc);
@@ -46,10 +45,13 @@ public class Server {
     public void run() throws IOException {
         try {
             while (true) {
-                Socket peerSocket = this.serverSocket.accept();
+                Socket socket = this.serverSocket.accept();
 
                 new Thread(
-                    new ForwardRequestThread(this.node, this.nc, peerSocket)
+                    new ForwardRequestThread(
+                        this.node, this.nc, socket,
+                        this.stabilizeThread
+                    )
                 ).start();
             }
         } catch(IOException e) {
@@ -57,17 +59,28 @@ public class Server {
         }
     }
 
+    /*
+     * Restores the previous user state if necessary based on if the
+     * address (IP/Port) of the user is the same as before. 
+     */
     private boolean restoreStateIfNecessary() {
         SaveState prevState = null;
-        String saveLoc = this.nc.getSaveLoc();
+        String saveLoc = this.nc.getSaveStateLoc();
         File saveFile = new File(saveLoc);
         boolean isRestored = false;
 
         try {
             saveFile.createNewFile();
 
-            FileInputStream myFileInputStream = new FileInputStream(saveFile);
-            ObjectInputStream objInputStream = new ObjectInputStream(myFileInputStream);
+            FileInputStream fileInputStream = new FileInputStream(saveFile);
+            // Empty file
+            if (fileInputStream.available() == 0) { 
+                fileInputStream.close();
+                return false; 
+            }
+            
+            ObjectInputStream objInputStream = new ObjectInputStream(fileInputStream);
+
             prevState = (SaveState) objInputStream.readObject(); 
             objInputStream.close();
         } catch (IOException | ClassNotFoundException e) {
@@ -85,21 +98,21 @@ public class Server {
         return isRestored;
     }
 
-    private void initializeThreads(boolean isRestored) {
+    private void initializeThreads(boolean isRestored, boolean isFirst) {
         try {
-            if (!isRestored) {
+            if (!isRestored && !isFirst) {
                 InitializeThread iThread = new InitializeThread(this.node);
                 Thread t = new Thread(iThread);
                 t.start();
                 t.join();
             }
     
-            // UserRequestThread uThread = new UserRequestThread();
-            // Thread t1 = new Thread(uThread);
-            // t.start();
+            UserRequestThread uThread = new UserRequestThread(this.nc);
+            Thread t1 = new Thread(uThread);
+            t1.start();
     
-            // this.stabilizeThread = new StabilizeThread(this.node, this.nc);
-            // Thread t2 = new Thread(sThread);
+            // this.stabilizeThread = new StabilizeThread(this.nc);
+            // Thread t2 = new Thread(this.stabilizeThread);
             // t2.start();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -107,18 +120,27 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        int serverPort;
+        int serverPort = 0;
+        boolean isFirst = false;
         
         if (args.length > 0) {
-            serverPort = Integer.parseInt(args[0]);
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("first") || args[i].equals("f")) {
+                    isFirst = true;
+                }
+                else if (args[i].equals("port") || args[i].equals("p")) {
+                    serverPort = Integer.parseInt(args[i + 1]);
+                    i++;
+                }
+            }
         }
-        else {
+        else if (serverPort == 0) {
             BufferedReader fromKeyboard = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Enter Port #: ");
             serverPort = Integer.parseInt(fromKeyboard.readLine());
-            fromKeyboard.close();
+            // fromKeyboard.close();
         }
-        new Server(serverPort).run();
+        new Server(serverPort, isFirst).run();
     }
 
 }
