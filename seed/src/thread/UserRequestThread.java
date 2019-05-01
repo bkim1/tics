@@ -24,20 +24,25 @@ public class UserRequestThread implements Runnable {
     }
     
 	public void run() {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Enter 1 for file upload, 2 for file retrieval");
-        Int answer = scan.nextInt();
-        if (answer == 1){
-            upload();
-        }
-        else{
-            initializeLookupRequest();
-        }
+        System.out.println("Enter 1 for file upload, 2 for file retrieval, 3 for changing default directory, and 4 for Leaving Network");
+        int UsrIn;
+        UsrIn = input.nextInt();
+        int userChoice = UsrIn;
+        switch (userChoice) {
+            case 1: ;
+            break;
+            case 2: ;
+            break;
+            case 3: ;
+            break;
+            case 4: ;
+            break;
 
+        }
 
 		switch(msg.getReqType()) {
 		case LOOKUP:
-			initializeLookupRequest();
+			//initializeLookupRequest();
             break;
         case UPLOAD:
             upload();
@@ -53,7 +58,7 @@ public class UserRequestThread implements Runnable {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter the name of the file you wish to retrieve");
         String fileName = scan.nextLine();
-        
+        //check if it is in myFiles
 
     }//lookup with getmyfiles
 
