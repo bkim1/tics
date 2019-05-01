@@ -38,7 +38,7 @@ public class NodeController {
         this.currentLookup.put(strKey, info);
     }
 
-    public FileInfo getFileInfo(long key) {
+    public FileInfo getLookupFileInfo(long key) {
         return this.currentLookup.get(Long.toString(key));
     }
 
@@ -46,12 +46,16 @@ public class NodeController {
         return this.applicationProps.getProperty("downloadLoc");
     }
 
+    public String getSaveLoc() {
+        return this.applicationProps.getProperty("saveLoc");
+    }
+
     public Peer getPeerObject() {
         // ip, port, key
-        return new Peer(this.node.getIP(), this.node.getPort(), this.node.getPeerId());
+        return this.node.getPeerObject();
     }
     
-    public Peer[] getFingerTables() {
+    public Peer[] getFingerTable() {
         return this.node.getFingerTable();
     }
     
@@ -69,4 +73,15 @@ public class NodeController {
 
         return info.getFilename();
     }
+
+    public FileInfo getRegisteredFileInfo(String filename) {
+        return this.node.getFileInfo(filename);
+    }
+
+    public boolean registerFileInfo(FileInfo info) {
+        this.node.addFile(info);
+        return true;
+    }
+
+    public long getPeerId() { return this.node.getPeerId(); }
 }
