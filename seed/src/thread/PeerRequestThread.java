@@ -49,12 +49,52 @@ public class PeerRequestThread implements Runnable {
 			break;
 			
 		case UPLOAD:
+			upload();
 			break;
 		}
 	}
+	
+	public void tcpSend(Message msg, InetAddress address, int port) {
+		try {
+			Socket socket = new Socket(address, port);
+			OutputStream os = socket.getOutputStream(); 
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+			oos.flush();
+			oos.writeObject(msg);   //send object to server
+			oos.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void upload() {
+		
+	}
 
 	public void join() {
-		
+		long key = msg.getKey();
+		Peer finger = msg.getFinger();
+		//if the finger does not equal the current node, then the finger is an entry of the
+		//current node's finger table
+		if(!finger.equals(node.getPeerObject())) {
+			int index = msg.getFingerIndex();
+			node.updateTableEntry(msg.getFingerIndex(), finger);
+			System.out.println("Finger table entry at index " + index + " updated to " + finger.getIP() + ".");
+		}
+		//if getFound() is true, then the current node is the target node
+		else if(msg.getFound()) {
+			Peer target = node.getPeerObject();
+			Peer receiver = msg.getPeer();
+			msg.setFinger(target);
+			tcpSend(msg, receiver.getIP(), receiver.getPort());
+			System.out.println("Sent message to node " + finger.getIP() + " with its " + msg.getFingerIndex() + " entry.");
+		}
+		//the current node is not the successor, perform lookUp
+		else {
+			Peer next = Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
+			System.out.println("The lookup is now occurring at node " + next.getIP() + ".");
+		}
 	}
 	
 	public Peer lookUp() {
@@ -62,23 +102,13 @@ public class PeerRequestThread implements Runnable {
 		if(msg.getFound()) {
 			PeerData data = this.node.getPeerData(msg.getKey());
 			Peer receiver = msg.getPeer();
-			
+	
 			//file exists
 			if(data != null) {
-				try {
-					Socket socket = new Socket(receiver.getIP(), receiver.getPort());
-					Peer sender = node.getPeerObject();
-					Message msg = new Message(ReqType.SEND, sender, data.getKey(), data.getData());
-					OutputStream os = socket.getOutputStream(); 
-					ObjectOutputStream oos = new ObjectOutputStream(os);
-					oos.flush();
-					oos.writeObject(msg);   //send object to server
-					oos.flush();
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				Peer sender = node.getPeerObject();
+				Message msg = new Message(ReqType.SEND, sender, data.getKey(), data.getData());	
+				tcpSend(msg, receiver.getIP(), receiver.getPort());
+				
 				return node.getPeerObject();
 			}
 			//file cannot be found
