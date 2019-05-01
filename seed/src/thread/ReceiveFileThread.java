@@ -8,13 +8,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.time.LocalDateTime;
 
-import node.NodeController;
+import node.*;
 
 public class ReceiveFileThread implements Runnable {
     private Message msg;
     private NodeController nc;
+    private Node node;
     private Peer peer;
     private Socket socket;
     private InputStream inputStream;
@@ -22,6 +22,7 @@ public class ReceiveFileThread implements Runnable {
     public ReceiveFileThread(Message msg, NodeController nc, Socket peerSocket) throws IOException {
         this.msg = msg;
         this.nc = nc;
+        this.node = this.nc.getNode();
         this.peer = msg.getPeer();
         this.socket = peerSocket;
         this.inputStream = this.socket.getInputStream();
@@ -33,7 +34,7 @@ public class ReceiveFileThread implements Runnable {
         try {
             String filename = this.getFile();
             if (this.verify(filename)) {
-                
+
             }
         } catch(IOException e) {
             e.printStackTrace();
