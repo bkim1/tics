@@ -117,9 +117,10 @@ public class Utilities {
 		long peerID = sender.getKey();
 		for(int i = 0; i < init.length; i++) {
 			//each entry is denoted by the hash of the node + 2^index of the finger table
-			long targetKey = peerID + (long) Math.pow(2, i);
+			long targetKey = (long) ((peerID + (long) Math.pow(2, i)) % Math.pow(2, 60));
 			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
 			msg.setFingerIndex(i);
+			msg.setFinger(sender);
 			//perform lookUp on node n + 2^index
 			lookUp(msg, init, peerID);
 			System.out.println("Searching for " + i + "th entry in finger table...");
