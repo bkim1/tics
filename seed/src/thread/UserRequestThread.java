@@ -2,10 +2,10 @@ package thread;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.File;
 import java.net.Socket;
 import java.util.List;
 import node.NodeController;
-import object.Message;
 import object.*;
 import utils.Utilities;
 import java.util.Scanner;
@@ -37,7 +37,9 @@ public class UserRequestThread implements Runnable {
             break;
             case 4: ;
             break;
-
+            
+            default: System.out.println("Please enter a valid input, an int between 1 and 4");
+            break;
         }
 
 		switch(msg.getReqType()) {
@@ -51,16 +53,38 @@ public class UserRequestThread implements Runnable {
 	}
 
     public void upload(){ //using lookup method, forward along appropriately
-        System.out.println("");
+        System.out.println("Enter the full local address of the file you wish to upload");
+        String newFileLocation;
+        newFileLocation = input.nextLine();
+        String userChoice = newFileLocation;
+        int index = newFileLocation.lastIndexOf("/");
+        if (index == newFileLocation.length()-1) {
+            index = newFileLocation.lastIndexOf("/", index);
+        }
+        String newFileName = newFileLocation.substring(index + 1);
+        
+        String fileContents = getContents(userChoice);
+        new FileInfo(fileLoc, filename)
+
     }
 
     public void initializeLookupRequest(Long key){
-        Scanner scan = new Scanner(System.in);
         System.out.println("Enter the name of the file you wish to retrieve");
-        String fileName = scan.nextLine();
+        String requestedFileName;
+        requestedFileName = input.nextLine();
+        String userChoice = requestedFileName;
         //check if it is in myFiles
 
-    }//lookup with getmyfiles
+    }
+    //lookup with getmyfiles
+
+    public void changeDefaultDownloadDirectory(){
+
+    }
+
+    public void leaveNetwork(){
+
+    }
 
 }
 
