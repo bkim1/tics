@@ -33,13 +33,16 @@ public class Utilities {
 				return null;
 			}*/
 			
+			//the target node is found if the keys are equal or 
+			//if the first entry on the finger table is the closest successor to the target key
 			if(nodeKey == targetKey || 
 			   (i == 0 && selfKey < nodeKey && nodeKey < targetKey)) {
 				msg.setFound();
 				break;
 			}
 			
-			//if we reach a node whose successor's key is larger than the file hash, we return the successor
+			//if we reach a node whose successor's key is larger than the file hash,
+			//the lookup continues at this new node
 			else if(msg.getKey() > finger.getKey() && i+1 < length && fingerTable[i+1].getKey() > msg.getKey()) {
 				break;
 			}	
