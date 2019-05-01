@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import static utils.Utilities.objToString;
+
 public class Peer implements Serializable {
     private static final long serialVersionUID = 314156L;
 
@@ -34,4 +36,6 @@ public class Peer implements Serializable {
                this.port == peer.getPort() &&
                this.key == peer.getKey();
     }
+
+    public String toString() { return objToString(this); }
 }

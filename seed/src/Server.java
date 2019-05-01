@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import node.*;
 import object.Message;
@@ -18,6 +17,7 @@ public class Server {
     private ServerSocket serverSocket;
     private Node node;
     private NodeController nc;
+    private StabilizeThread stabilizeThread;
 
     public Server(int port) throws IOException, InterruptedException {
         this.port = port;
@@ -25,25 +25,26 @@ public class Server {
         this.node = new Node(InetAddress.getLocalHost(), this.port);
         this.nc = new NodeController(node);
 
-        SetupThread sThread = new SetupThread(this.node, this.serverSocket);
-        Thread t = new Thread(sThread);
+        InitializeThread iThread = new InitializeThread(this.node);
+        Thread t = new Thread(iThread);
         t.start();
         t.join();
 
         // UserRequestThread uThread = new UserRequestThread();
         // t = new Thread(uThread);
         // t.start();
+
+        // this.stabilizeThread = new StabilizeThread(this.node, this.nc);
+        // t = new Thread(sThread);
     }
 
-    public void run() throws UnknownHostException, IOException {
-        // Startup the UserRequestThread to handle user input
-        Message msg;
+    public void run() throws IOException {
         try {
             while (true) {
                 Socket peerSocket = this.serverSocket.accept();
 
-                msg = this.getMessage(peerSocket);
-                this.processMessage(msg, peerSocket);
+                Message msg = this.getMessage(peerSocket);
+                this.forwardMessage(msg, peerSocket);
             }
         } catch(IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -57,7 +58,7 @@ public class Server {
         return msg;
     }
 
-    private void processMessage(Message msg, Socket peerSocket) throws IOException {
+    private void forwardMessage(Message msg, Socket peerSocket) throws IOException {
         Thread t;
         
         switch(msg.getReqType()) {
@@ -71,9 +72,13 @@ public class Server {
                 t = new Thread(rfThread);
                 break;
             case STABILIZE: case STABILIZE_PRED_RESP: case STABILIZE_PRED_REQ:
-                StabilizeThread sThread = new StabilizeThread(msg, this.nc);
-                t = new Thread(sThread);
+                // this.stabilizeThread.request(msg);
+                t = new Thread();
                 peerSocket.close();
+                break;
+            case SETUP:
+                SetupRequestThread sThread = new SetupRequestThread(this.node, peerSocket);
+                t = new Thread(sThread);
                 break;
             default:
                 System.out.println("Unknown ReqType... Closing socket.");

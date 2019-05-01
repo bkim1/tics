@@ -8,7 +8,7 @@ import object.FileInfo;
 import object.Peer;
 import object.PeerData;
 import static utils.Constants.RING_SIZE;
-import static utils.Utilities.generatePeerId;;
+import utils.Utilities;
 
 public class Node {
     private String password;
@@ -40,7 +40,6 @@ public class Node {
             return this.password;
         }
     }
-    private void generateKey() {}
 
     public long getPeerId() {
         synchronized(addressLock) {
@@ -52,7 +51,7 @@ public class Node {
         synchronized(addressLock) {
             this.ip = ip;
             this.port = port;
-            this.peerId = generatePeerId(this.ip, this.port);
+            this.peerId = Utilities.generatePeerId(this.ip, this.port);
         }
     }
 
@@ -64,7 +63,7 @@ public class Node {
     public void setIP(InetAddress ip) {
         synchronized(addressLock) {
             this.ip = ip;
-            this.peerId = generatePeerId(this.ip, this.port);
+            this.peerId = Utilities.generatePeerId(this.ip, this.port);
         }
     }
 
@@ -76,7 +75,7 @@ public class Node {
     public void setPort(int port) {
         synchronized(addressLock) {
             this.port = port;
-            this.peerId = generatePeerId(this.ip, this.port);
+            this.peerId = Utilities.generatePeerId(this.ip, this.port);
         }
     }
 
@@ -115,13 +114,32 @@ public class Node {
     }
     public void updateFingerTable(Peer[] fingerTable) {
         synchronized(fingerTableLock){
-            this.fingerTable = fingerTable; 
+            this.fingerTable = fingerTable;
+
+            System.out.println("Finger Table has been updated!");
+            System.out.println("Updated version: ");
+            this.printFingerTable();
         }
     }
     public void updateFingerTable(Peer peer, int index) {
         synchronized(fingerTableLock) {
             this.fingerTable[index] = peer;
+
+            System.out.println("Finger Table has been updated!");
+            System.out.println("Updated version: ");
+            this.printFingerTable();
         }
+    }
+
+    public void printFingerTable() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("i\t| Peer\n");
+        sb.append("-------------------------\n");
+        for (int i = 0; i < this.fingerTable.length; i++) {
+            sb.append(Integer.toString(i) + "\t| " + this.fingerTable[i].toString() + "\n");
+        }
+
+        System.out.println(sb.toString() + "\n");
     }
 
     public Map<String, PeerData> getPeerFiles() {
@@ -151,4 +169,6 @@ public class Node {
             this.myFiles.put(file.getFilename(), file);
         }
     }
+
+    public String toString() { return Utilities.objToString(this); }
 }
