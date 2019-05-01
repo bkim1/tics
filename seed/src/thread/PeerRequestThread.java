@@ -25,6 +25,8 @@ public class PeerRequestThread implements Runnable {
 	@Override
 	public void run() {
 		
+		
+		Peer next;
 		switch(msg.getReqType()) {
 		case JOIN:
 			join();
@@ -33,13 +35,16 @@ public class PeerRequestThread implements Runnable {
 			Peer current = node.getPeerObject();
 			InetAddress currentIP = current.getIP();
 			System.out.println("Node " + currentIP + " now performing look up...");
-			Peer next = lookUp();
+			next = lookUp();
 			if(next == null) { System.out.println("File not found."); }
 			else if(current.equals(next)) { System.out.println("File has been found."); }
 			else { 
 				System.out.println("The look up is now occuring at node " + next.getIP());
 			}
 			break;
+		case SETUP:
+			next = Utilities.lookUp(msg, node.getFingerTable());
+			
 		case UPLOAD:
 			
 			break;
@@ -94,7 +99,7 @@ public class PeerRequestThread implements Runnable {
 			}
 			return node.getPeerObject();
 		}
-		return Utilities.lookUp(msg, this.node.getFingerTable());
+		return Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
 	}
 	
 	
