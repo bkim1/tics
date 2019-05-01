@@ -112,6 +112,16 @@ public class Utilities {
 
 		return result.toString();
 	}
+	
+	public void generateFingerTable(Peer[] init, Peer sender) {
+		long peerID = sender.getKey();
+		for(int i = 0; i < init.length; i++) {
+			long targetKey = peerID + (long) Math.pow(2, i);
+			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
+			Peer next = lookUp(msg, init, peerID);
+			System.out.println("Searching for " + i + "th entry in finger table...");
+		}
+	}
 
 	public String getContents(String fileName) {
 		StringBuffer buff = new StringBuffer();

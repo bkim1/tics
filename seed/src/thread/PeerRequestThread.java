@@ -28,9 +28,12 @@ public class PeerRequestThread implements Runnable {
 		
 		Peer next;
 		switch(msg.getReqType()) {
+		
 		case JOIN:
 			join();
 			break;
+		
+		//file lookup	
 		case LOOKUP:
 			Peer current = node.getPeerObject();
 			InetAddress currentIP = current.getIP();
@@ -38,19 +41,56 @@ public class PeerRequestThread implements Runnable {
 			next = lookUp();
 			if(next == null) { System.out.println("File not found."); }
 			else if(current.equals(next)) { System.out.println("File has been found."); }
-			else { 
-				System.out.println("The look up is now occuring at node " + next.getIP());
-			}
+			else { System.out.println("The look up is now occuring at node " + next.getIP()); }
 			break;
+			
 		case SETUP:
 			next = Utilities.lookUp(msg, node.getFingerTable());
+			break;
 			
 		case UPLOAD:
-			
 			break;
 		}
 	}
+
+	public void join() {
+		
+	}
 	
+	public Peer lookUp() {
+		//if msg.getFound() is true, then the current node is the file successor
+		if(msg.getFound()) {
+			PeerData data = this.node.getPeerData(msg.getKey());
+			Peer receiver = msg.getPeer();
+			
+			//file exists
+			if(data != null) {
+				try {
+					Socket socket = new Socket(receiver.getIP(), receiver.getPort());
+					Peer sender = node.getPeerObject();
+					Message msg = new Message(ReqType.SEND, sender, data.getKey(), data.getData());
+					OutputStream os = socket.getOutputStream(); 
+					ObjectOutputStream oos = new ObjectOutputStream(os);
+					oos.flush();
+					oos.writeObject(msg);   //send object to server
+					oos.flush();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return node.getPeerObject();
+			}
+			//file cannot be found
+			else {
+				return null;
+			}
+		}
+		//not the correct node, continue lookup
+		return Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
+	}
+	
+	/*
 	public void sendFile(Peer peer, Long key) {
 		PeerData data = this.node.getPeerData(key);
 		if(data != null) {
@@ -72,35 +112,7 @@ public class PeerRequestThread implements Runnable {
 		else {
 			lookUp();	
 		}
-	}
-	
-	public void join() {
-		
-	}
-	
-	public Peer lookUp() {
-		PeerData data = this.node.getPeerData(msg.getKey());
-		Peer receiver = msg.getPeer();
-		
-		if(data != null) {
-			try {
-				Socket socket = new Socket(receiver.getIP(), receiver.getPort());
-				Peer sender = node.getPeerObject();
-				Message msg = new Message(ReqType.SEND, sender, data.getKey(), data.getData());
-				OutputStream os = socket.getOutputStream(); 
-				ObjectOutputStream oos = new ObjectOutputStream(os);
-				oos.flush();
-				oos.writeObject(msg);   //send object to server
-				oos.flush();
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return node.getPeerObject();
-		}
-		return Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
-	}
+	}*/
 	
 	
 
