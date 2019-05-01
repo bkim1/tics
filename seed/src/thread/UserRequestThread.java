@@ -63,8 +63,9 @@ public class UserRequestThread implements Runnable {
         Scanner retrieveScan = new Scanner(System.in);
         String requestedFileName = retrieveScan.nextLine();
         Peer peer = this.nc.getPeerObject();
-        Message msg = new Message(ReqType.LOOKUP, peer, requestedFileName.getKey());
-        Utilities.lookUp(msg, this.nc.getRegisteredFileInfo(requestedFileName), this.nc.getPeerId());
+        FileInfo requestFileInfo = this.nc.getRegisteredFileInfo(requestedFileName);
+        Message msg = new Message(ReqType.LOOKUP, peer, requestFileInfo.getKey());
+        Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
 
         //first check if it is currently a file that i've actually uploaded
         //nodes myfiles myfiles.contains    to get the actual fileinfo obj for the lookup, use 
