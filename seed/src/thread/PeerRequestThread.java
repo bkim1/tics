@@ -29,11 +29,13 @@ public class PeerRequestThread implements Runnable {
 		Peer next;
 		switch(msg.getReqType()) {
 		
+		//sent by joining node to nodes corresponding to its finger table entries
+		//also sent by fingers back to joining node to establish its finger table
 		case JOIN:
 			join();
 			break;
 		
-		//file lookup	
+		//sent by nodes looking for a file	
 		case LOOKUP:
 			Peer current = node.getPeerObject();
 			InetAddress currentIP = current.getIP();
@@ -43,11 +45,14 @@ public class PeerRequestThread implements Runnable {
 			else if(current.equals(next)) { System.out.println("File has been found."); }
 			else { System.out.println("The look up is now occuring at node " + next.getIP()); }
 			break;
-			
+		
+		//sent by joining node to nodes whose finger tables may be affected by new node
+		//in order to update
 		case SETUP:
-			next = Utilities.lookUp(msg, node.getFingerTable());
+			setUp();
 			break;
-			
+		
+		//sent by nodes looking to upload a file	
 		case UPLOAD:
 			upload();
 			break;
@@ -68,10 +73,58 @@ public class PeerRequestThread implements Runnable {
 		}
 	}
 	
-	public void upload() {
-		
+	/* SETUP MESSAGE
+	 * Peer = joiner
+	 * key = hash of affected node
+	 */
+	public void setUp() {
+		//if current node is the affected node, go through finger table and replace out-of-date entries
+		if(msg.getFound()) {
+			Peer[] fingerTable = node.getFingerTable();
+			long nodeHash = node.getPeerId();
+			Peer join = msg.getPeer();
+			long key = msg.getKey();
+			for(int i = 0; i < fingerTable.length; i++) {
+				//if the new node's hash is a successor of node n + 2^i and is smaller than the 
+				//current corresponding figure, the old finger is replaced with the new node
+				if(key >= nodeHash + Math.pow(2, i) && key < fingerTable[i].getKey()) {
+					node.updateFingerTable(join, i);
+					System.out.println("Finger table entry " + i + " updated with new node " + join.getIP() + ".");
+				}
+			}
+		}
+		//otherwise continue lookup
+		else {
+			Peer peer = Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
+			System.out.println("The look up is now occurding at node " + peer.getIP() + ".");
+		}
 	}
-
+	
+	/* UPLOAD MESSAGE
+	 * Peer = origin
+	 * data = file
+	 * key = file hash
+	 */
+	public void upload() {
+		//if the current node is the target node, add data to files
+		if(msg.getFound()) {
+			PeerData peerData = new PeerData(msg.getKey(), msg.getData());
+			node.addPeerFile(peerData);
+			System.out.println("Data stored successfully.");
+		}
+		//if current node is not the target, perform lookUp
+		else {
+			Peer next = Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
+		}
+	}
+	
+	/* JOIN MESSAGE
+	 * Peer = origin
+	 * fingerIndex = entry index in origin's finger table
+	 * finger = hash of node that is a finger in origin's finger table
+	 * 			(if not yet found, the finger is origin)
+	 * key = hash of origin node + 2^fingerIndex mod 2^60
+	 */
 	public void join() {
 		//long key = msg.getKey();
 		Peer finger = msg.getFinger();
@@ -97,6 +150,10 @@ public class PeerRequestThread implements Runnable {
 		}
 	}
 	
+	/* LOOKUP MESSAGE
+	 * Peer = origin
+	 * key = file hash
+	 */
 	public Peer lookUp() {
 		//if msg.getFound() is true, then the current node is the file successor
 		if(msg.getFound()) {
