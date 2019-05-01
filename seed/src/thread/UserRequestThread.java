@@ -22,7 +22,6 @@ public class UserRequestThread implements Runnable {
         this.msg = msg;
         this.nc = nc;
         this.peer = msg.getPeer();
-        this.node = n;
     }
     
 	public void run() {
@@ -53,20 +52,28 @@ public class UserRequestThread implements Runnable {
         }
         String newFileName = newFileLocation.substring(index + 1);
         //generate a key for the file using the newFileName
-        FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName);
+        FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName); //register file info in nodecontroller
         Peer peer = this.nc.getPeerObject();
         Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
-        Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
+        Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
     }
 
-    // public void initializeLookupRequest(){
-    //     System.out.println("Enter the name of the file you wish to retrieve");
-    //     String requestedFileName;
-    //     requestedFileName = input.nextLine();
-    //     String userChoice = requestedFileName;
-    //     //check if it is in myFiles
+    public void initializeLookupRequest(){
+        System.out.println("Enter the name of the file you wish to retrieve");
+        Scanner retrieveScan = new Scanner(System.in);
+        String requestedFileName = retrieveScan.nextLine();
+        Peer peer = this.nc.getPeerObject();
+        Message msg = new Message(ReqType.LOOKUP, peer, requestedFileName.getKey());
+        Utilities.lookUp(msg, this.nc.getRegisteredFileInfo(requestedFileName));
 
-    // }
+        //first check if it is currently a file that i've actually uploaded
+        //nodes myfiles myfiles.contains    to get the actual fileinfo obj for the lookup, use 
+        //go through nodecontroller though
+        //where i will look at 
+
+        //check if it is in myFiles
+
+    }
     //lookup with getmyfiles
 
     public void changeDefaultDownloadDirectory(){
@@ -78,8 +85,3 @@ public class UserRequestThread implements Runnable {
     }
 
 }
-
-//upload
-//initiializeLookupRequest
-//later: change default download directory
-//later: leaveNetwork
