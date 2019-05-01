@@ -102,7 +102,7 @@ public class Utilities {
 	}
 
 	public String getContents(String fileName) {
-		buff = new StringBuffer();
+		StringBuffer buff = new StringBuffer();
 		try {
 			File openFile = new File(fileName);
 			File f = new File(fileName);
@@ -111,7 +111,7 @@ public class Utilities {
 				System.out.println("file: " + fileName + " exits");
 				Scanner inFile = new Scanner(openFile);
 				while (inFile.hasNext()) {
-					line = inFile.nextLine();
+					String line = inFile.nextLine();
 					//System.out.println(line);
 					buff.append(line);
 					buff.append("\n");

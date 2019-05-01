@@ -29,13 +29,13 @@ public class UserRequestThread implements Runnable {
         UsrIn = input.nextInt();
         int userChoice = UsrIn;
         switch (userChoice) {
-            case 1: ;
+            case 1: upload();
             break;
-            case 2: ;
+            case 2: initializeLookupRequest(key);
             break;
-            case 3: ;
+            case 3: changeDefaultDownloadDirectory();
             break;
-            case 4: ;
+            case 4: leaveNetwork();
             break;
             
             default: System.out.println("Please enter a valid input, an int between 1 and 4");
@@ -62,7 +62,7 @@ public class UserRequestThread implements Runnable {
             index = newFileLocation.lastIndexOf("/", index);
         }
         String newFileName = newFileLocation.substring(index + 1);
-        
+
         String fileContents = getContents(userChoice);
         new FileInfo(fileLoc, filename)
 
