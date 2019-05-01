@@ -48,7 +48,7 @@ public class NodeController {
 
     public Peer getPeerObject() {
         // ip, port, key
-        return new Peer(this.node.getIP(), this.node.getPort(), this.node.getPeerId());
+        return this.node.getPeerObject();
     }
     
     public Peer[] getFingerTables() {
