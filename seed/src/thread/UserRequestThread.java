@@ -38,7 +38,7 @@ public class UserRequestThread implements Runnable {
                     // break;
                     // case 4: leaveNetwork();
                     // break;
-                    // default: System.out.println("Please enter a valid input, an int between 1 and 4");
+                    default: System.out.println("Please enter a valid input, an int between 1 and 4");
                     break;
                 }
             } catch (InputMismatchException e) {
