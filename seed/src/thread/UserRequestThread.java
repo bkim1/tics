@@ -33,6 +33,8 @@ public class UserRequestThread implements Runnable {
         else{
             initializeLookupRequest();
         }
+
+
 		switch(msg.getReqType()) {
 		case LOOKUP:
 			initializeLookupRequest();
@@ -47,9 +49,13 @@ public class UserRequestThread implements Runnable {
         System.out.println("");
     }
 
-    public void initializeLookupRequest(){
+    public void initializeLookupRequest(Long key){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter the name of the file you wish to retrieve");
+        String fileName = scan.nextLine();
+        
 
-    }
+    }//lookup with getmyfiles
 
 }
 
