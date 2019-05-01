@@ -56,7 +56,7 @@ public class UserRequestThread implements Runnable {
         FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName);
         Peer peer = this.nc.getPeerObject();
         Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
-        Utilities.lookUp(msg, this.node.getFingerTable());
+        Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
     }
 
     // public void initializeLookupRequest(){
