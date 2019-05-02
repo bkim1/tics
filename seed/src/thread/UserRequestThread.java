@@ -32,8 +32,8 @@ public class UserRequestThread implements Runnable {
                     break;
                     case 2: initializeLookupRequest();
                     break;
-                    // case 3: changeDefaultDownloadDirectory();
-                    // break;
+                    case 3: changeDefaultDownloadDirectory();
+                    break;
                     // case 4: leaveNetwork();
                     // break;
                     default: System.out.println("Please enter a valid input, an int between 1 and 4");
