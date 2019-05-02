@@ -33,8 +33,8 @@ public class Utilities {
 			int nodeKey = finger.getKey();
 			int targetKey = msg.getKey();
 
-			System.out.println("Node Key: " + Integer.toString(nodeKey));
-			System.out.println("Target Key: " + Integer.toString(targetKey));
+			// System.out.println("Node Key: " + Integer.toString(nodeKey));
+			// System.out.println("Target Key: " + Integer.toString(targetKey));
 			/*
 			if(finger.equals(msg.getPeer())) {
 				return null;
