@@ -50,9 +50,13 @@ public class InitializeThread implements Runnable {
         this.updateFingerTable(initTable);
 
         // Call Rocky's Utility function
+        // Use Node's actual server
 
-        // Use newly updated fingerTable to send JOIN msg to affected range
-        this.notifyAffectedNodes();
+        try {
+            this.servSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendSetupMessage() {
@@ -74,6 +78,10 @@ public class InitializeThread implements Runnable {
         }
     }
 
+    /*
+     * Sets up the server socket to accept all incoming requests
+     * specifically for the initialization process
+    */
     private void setupServerSocket() {
         try {
             this.socket.close();
