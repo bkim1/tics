@@ -127,6 +127,7 @@ public class Server {
             for (int i = 0; i < args.length; i++) {
                 if (args[i].equals("first") || args[i].equals("f")) {
                     isFirst = true;
+                    serverPort = 10000;
                 }
                 else if (args[i].equals("port") || args[i].equals("p")) {
                     serverPort = Integer.parseInt(args[i + 1]);
