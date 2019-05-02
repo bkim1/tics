@@ -13,6 +13,7 @@ import node.Node;
 import object.Message;
 import object.Peer;
 import object.ReqType;
+import utils.Utilities;
 
 import static utils.Constants.*;
 import static utils.Constants.RING_SIZE;
@@ -46,8 +47,9 @@ public class InitializeThread implements Runnable {
         this.setupServerSocket();
         this.sendSetupMessage();
         Peer[] initTable = this.getInitialFingerTable();
+        this.node.updateFingerTable(initTable, false);
 
-        this.updateFingerTable(initTable);
+        Utilities.adjustFingerTable(this.node, this.entryPeer);
 
         // Call Rocky's Utility function
         // Use Node's actual server address
@@ -132,15 +134,5 @@ public class InitializeThread implements Runnable {
         }
 
         return initFingerTable;
-    }
-
-    private void updateFingerTable(Peer[] fingerTable) {
-        if (fingerTable == null || fingerTable[0] == null) {
-            fingerTable = new Peer[RING_SIZE];
-            for (int i = 0; i < RING_SIZE; i++) {
-                fingerTable[i] = this.entryPeer;
-            }
-        }
-        this.node.updateFingerTable(fingerTable);
     }
 }

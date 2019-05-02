@@ -11,15 +11,15 @@ public class Peer implements Serializable {
 
     private InetAddress ip;
     private int port, setupPort;
-    private long key;
+    private int key;
 
-    public Peer(InetAddress ip, int port, long key) {
+    public Peer(InetAddress ip, int port, int key) {
         this.ip = ip;
         this.port = port;
         this.key = key;
     }
     
-    public Peer(InetAddress ip, int port, int setupPort, long key) {
+    public Peer(InetAddress ip, int port, int setupPort, int key) {
         this.ip = ip;
         this.port = port;
         this.setupPort = setupPort;
@@ -38,8 +38,8 @@ public class Peer implements Serializable {
     public int getSetupPort() { return this.setupPort; }
     public void setSetupPort(int setupPort) { this.setupPort = setupPort; }
 
-    public long getKey() { return this.key; }
-    public void setKey(long key) { this.key = key; }
+    public int getKey() { return this.key; }
+    public void setKey(int key) { this.key = key; }
 
     public boolean equals(Peer peer) {
         return this.ip.equals(peer.getIP()) &&

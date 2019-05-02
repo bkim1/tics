@@ -9,7 +9,7 @@ import node.Node;
 public class SaveState implements Serializable {
     private static final long serialVersionUID = 5728591L;
 
-    private long peerId;
+    private int peerId;
     private InetAddress ip;
     private int port;
     private Peer predecessor;
@@ -27,7 +27,7 @@ public class SaveState implements Serializable {
         this.myFiles = node.getMyFiles();
     }
 
-    public long getPeerId() { return this.peerId; }
+    public int getPeerId() { return this.peerId; }
 
     public InetAddress getIP() { return this.ip; }
 

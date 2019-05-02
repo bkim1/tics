@@ -32,13 +32,13 @@ public class NodeController {
 
     public Node getNode() { return this.node; }
 
-    public void addLookup(long key, FileInfo info) {
-        String strKey = Long.toString(key);
+    public void addLookup(int key, FileInfo info) {
+        String strKey = Integer.toString(key);
         this.currentLookup.put(strKey, info);
     }
 
-    public FileInfo getLookupFileInfo(long key) {
-        return this.currentLookup.getOrDefault(Long.toString(key), null);
+    public FileInfo getLookupFileInfo(int key) {
+        return this.currentLookup.getOrDefault(Integer.toString(key), null);
     }
 
     public String getDownloadLoc() {
@@ -66,7 +66,7 @@ public class NodeController {
         return this.node.getFingerTable();
     }
     
-    public PeerData getPeerFiles(long key) {
+    public PeerData getPeerFiles(int key) {
         return this.node.getPeerData(key);
     }
 
@@ -74,8 +74,8 @@ public class NodeController {
         return this.node.getSuccessor();
     }
 
-    public String getFilename(long key) {
-        String strKey = Long.toString(key);
+    public String getFilename(int key) {
+        String strKey = Integer.toString(key);
         FileInfo info = this.currentLookup.get(strKey);
 
         return info.getFilename();
@@ -90,5 +90,5 @@ public class NodeController {
         return true;
     }
 
-    public long getPeerId() { return this.node.getPeerId(); }
+    public int getPeerId() { return this.node.getPeerId(); }
 }

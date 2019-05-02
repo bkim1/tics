@@ -9,7 +9,7 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 3258205L;
 
     private ReqType msgType;
-    private long key;
+    private int key;
     private byte[] data;
     private Peer peer;
     private Peer finger;
@@ -17,7 +17,7 @@ public class Message implements Serializable {
     private Peer[] updatedPeers;
     private boolean isFound = false;
 
-    public Message(ReqType msgType, Peer peer, long key, byte[] data) {
+    public Message(ReqType msgType, Peer peer, int key, byte[] data) {
         this.msgType = msgType;
         this.peer = peer;
         this.key = key;
@@ -35,7 +35,7 @@ public class Message implements Serializable {
         this.updatedPeers = updatedPeers;
     }
 
-    public Message(ReqType msgType, Peer peer, long Key) {
+    public Message(ReqType msgType, Peer peer, int Key) {
         this.msgType = msgType;
         this.peer = peer;
         this.key = Key;
@@ -50,8 +50,8 @@ public class Message implements Serializable {
     public ReqType getReqType() { return this.msgType; }
     public void setReqType(ReqType rt) { this.msgType = rt; }
 
-    public long getKey() { return this.key; }
-    public void setKey(long key) { this.key = key; }
+    public int getKey() { return this.key; }
+    public void setKey(int key) { this.key = key; }
 
     public byte[] getData() { return this.data; }
     public void setData(byte[] data) { this.data = data; }

@@ -11,7 +11,7 @@ import static utils.Constants.RING_SIZE;
 import utils.Utilities;
 
 public class Node {
-    private long peerId;
+    private int peerId;
     private InetAddress ip;
     private int port;
     private Peer[] fingerTable;
@@ -35,7 +35,7 @@ public class Node {
         System.out.println("Peer ID: " + this.peerId);
     }
 
-    public long getPeerId() {
+    public int getPeerId() {
         synchronized(addressLock) {
             return this.peerId;
         }
@@ -115,6 +115,15 @@ public class Node {
             this.printFingerTable();
         }
     }
+    public void updateFingerTable(Peer[] fingerTable, boolean print) {
+        synchronized(fingerTableLock){
+            this.fingerTable = fingerTable;
+
+            System.out.println("Finger Table has been updated!");
+            System.out.println("Updated version: ");
+            if (print) { this.printFingerTable(); }
+        }
+    }
     public void updateFingerTable(Peer peer, int index) {
         synchronized(fingerTableLock) {
             this.fingerTable[index] = peer;
@@ -154,13 +163,13 @@ public class Node {
             return this.peerFiles;
         }
     }
-    public PeerData getPeerData(long key) {
+    public PeerData getPeerData(int key) {
         synchronized(peerFilesLock) {
-            return this.peerFiles.get(Long.toString(key));
+            return this.peerFiles.get(Integer.toString(key));
         }
     }
     public void addPeerFile(PeerData data) {
-        String strKey = Long.toString(data.getKey());
+        String strKey = Integer.toString(data.getKey());
         synchronized(peerFilesLock) {
             this.peerFiles.put(strKey, data);
         }

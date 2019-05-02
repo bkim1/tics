@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import object.DataShard;
+import utils.Utilities;
+
 import static utils.Constants.RING_SIZE;
 import static utils.Constants.SALT_SIZE;
 import static utils.Utilities.objToString;
@@ -22,7 +24,7 @@ public class FileInfo implements Serializable {
     private String filename;
     private List<DataShard> shardHashes;
     private byte[] salt;
-    private long key;
+    private int key;
     private boolean isReceiving;
     private int currentReceived;
 
@@ -77,21 +79,9 @@ public class FileInfo implements Serializable {
         random.nextBytes(this.salt);
     }
 
-    public long getKey() { return this.key; }
+    public int getKey() { return this.key; }
     private void updateKey() {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(this.filename.getBytes(Charset.forName("UTF-8")));
-            digest.update(this.salt);
-            byte[] buf = Arrays.copyOfRange(digest.digest(), 0, RING_SIZE);
-
-            ByteBuffer buffer = ByteBuffer.wrap(buf);
-            this.key = buffer.getLong();
-
-            if (key < 0) { key = -key; }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        this.key = Utilities.generateFileKey(this.filename, this.salt);
     }
 
     public boolean isReceiving() { return this.isReceiving; }

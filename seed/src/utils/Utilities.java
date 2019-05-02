@@ -1,6 +1,5 @@
 package utils;
 
-import static utils.Constants.RING_SIZE;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -14,26 +13,28 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Scanner;
-
-import node.Node;
-
 import java.io.File;
 
+
+import node.Node;
 import object.*;
+import static utils.Constants.RING_SIZE;
+import static utils.Constants.RING_SIZE_BYTES;
+
 
 public class Utilities {
 
-	public static Peer lookUp(Message msg, Peer[] fingerTable, long selfKey) {
+	public static Peer lookUp(Message msg, Peer[] fingerTable, int selfKey) {
 		Peer finger = null;
 		int length = fingerTable.length;
 		
 		for(int i = 0; i < length; i++) {
 			finger = fingerTable[i];
-			long nodeKey = finger.getKey();
-			long targetKey = msg.getKey();
+			int nodeKey = finger.getKey();
+			int targetKey = msg.getKey();
 
-			System.out.println("Node Key: " + Long.toString(nodeKey));
-			System.out.println("Target Key: " + Long.toString(targetKey));
+			System.out.println("Node Key: " + Integer.toString(nodeKey));
+			System.out.println("Target Key: " + Integer.toString(targetKey));
 			/*
 			if(finger.equals(msg.getPeer())) {
 				return null;
@@ -70,22 +71,39 @@ public class Utilities {
 		}
 		return finger;
 	}
-	
-	public static long generatePeerId(InetAddress ip, int port) {
-		long key = -1;
+
+	public static int generatePeerId(InetAddress ip, int port) {
+		int key = -1;
 		
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			digest.update(ip.toString().getBytes(Charset.forName("UTF-8")));
 			digest.update(Integer.valueOf(port).byteValue());
-			byte[] bytes = Arrays.copyOfRange(digest.digest(), 0, RING_SIZE);
-			ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			key = buffer.getLong();
-			// System.out.println("Int Key: " + Integer.toString(buffer.getInt()));
+			Byte bits = digest.digest()[RING_SIZE];
+			System.out.println(bits);
+			key = bits.intValue();
+			System.out.println("Int Key: " + key);
 			
 			if (key < 0) { key = -key; }
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
+		}
+		return key;
+	}
+
+	public static int generateFileKey(String filename, byte[] salt) {
+		int key = -1;
+		try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(filename.getBytes(Charset.forName("UTF-8")));
+            digest.update(salt);
+            Byte bits = digest.digest()[RING_SIZE];
+
+            key = bits.intValue();
+
+            if (key < 0) { key = -key; }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
 		}
 		return key;
 	}
@@ -123,10 +141,10 @@ public class Utilities {
 	}
 	
 	public void generateFingerTable(Peer[] init, Peer sender) {
-		long peerID = sender.getKey();
+		int peerID = sender.getKey();
 		for(int i = 0; i < init.length; i++) {
 			//each entry is denoted by the hash of the node + 2^index of the finger table
-			long targetKey = (long) ((peerID + (long) Math.pow(2, i)) % Math.pow(2, 60));
+			int targetKey = getFingerTableThreshold(peerID, i);
 			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
 			msg.setFingerIndex(i);
 			msg.setFinger(sender);
@@ -138,9 +156,14 @@ public class Utilities {
 	
 	public static void adjustFingerTable(Node node, Peer peer) {
 		Peer[] fingerTable = node.getFingerTable();
-		long currentKey = node.getPeerId();
-		long peerKey = peer.getKey();
-		long threshold;
+		Peer[] originalTable = Arrays.copyOf(fingerTable, fingerTable.length);
+
+		if (fingerTable == null) {
+			fingerTable = new Peer[RING_SIZE];
+		}
+		int currentKey = node.getPeerId();
+		int peerKey = peer.getKey();
+		int threshold;
 
 		for (int i = 0; i < fingerTable.length; i++) { 
 			// Empty fingerTable --> Assign peer and skip over rest
@@ -155,30 +178,60 @@ public class Utilities {
 
 			// Standard case for inserting new node
 			// When new node's key is less than the finger's key
-			if (threshold <= peerKey && finger.getKey() > peerKey) {
+			if (threshold > finger.getKey() && peerKey >= threshold) {
+				shiftTableRight(fingerTable, i);
+				fingerTable[i] = findBestFinger(currentKey, threshold, originalTable, peer);
+			}
+			else if (threshold <= peerKey && finger.getKey() > peerKey) {
 				System.out.println("Standard Case hit!");
 				// Shift nodes to the right for new entry
-				for (int j = i + 1; j < fingerTable.length; j++) {
-					fingerTable[j] = fingerTable[j - 1];
-				}
-				fingerTable[i] = peer;
+				shiftTableRight(fingerTable, i);
+				fingerTable[i] = findBestFinger(currentKey, threshold, originalTable, peer);
 			}
 			// Case for when it loops around the ring
 			else if (finger.getKey() < threshold &&
 					 (peerKey < finger.getKey() || peerKey >= threshold)) {
 				System.out.println("Edge case hit!");
 				// Shift nodes to the right for new entry
-				for (int j = i + 1; j < fingerTable.length; j++) {
-					fingerTable[j] = fingerTable[j - 1];
-				}
-				fingerTable[i] = peer;	
+				shiftTableRight(fingerTable, i);
+				fingerTable[i] = findBestFinger(currentKey, threshold, originalTable, peer);	
 			}
 		}
 		node.updateFingerTable(fingerTable);
 	}
 
-	public static long getFingerTableThreshold(long currentKey, int index) {
-		return (long) ((currentKey + Math.pow(2, index)) % Math.pow(2, RING_SIZE));
+	public static int getFingerTableThreshold(int currentKey, int index) {
+		int sum = currentKey + ((int) Math.pow(2, index + 1) - 1);
+		int remainder = sum % (int) Math.pow(2, RING_SIZE);
+		return remainder;
+	}
+
+	public static void shiftTableRight(Peer[] fingerTable, int index) {
+		for (int j = index + 1; j < fingerTable.length; j++) {
+			fingerTable[j] = fingerTable[j - 1];
+		}
+	}
+
+	public static Peer findBestFinger(int currentKey, int threshold, Peer[] fingerTable, Peer peer) {
+		Peer bestPeer = peer;
+		System.out.println("\nEntered findBestFinger\n");
+
+		for (int i = 0; i < fingerTable.length; i++) {
+			Peer p = fingerTable[i];
+			System.out.println("Finger: " + p.getKey() + " Peer: " + peer.getKey());
+			if (threshold <= p.getKey() && threshold <= peer.getKey() &&
+					p.getKey() - threshold < peer.getKey() - threshold) {
+				bestPeer = p;
+				System.out.println("Find Best Finger: 1st case!");
+			}
+			else if (threshold > p.getKey() && threshold > peer.getKey() &&
+					 threshold - p.getKey() > threshold - peer.getKey()) {
+				bestPeer = p;
+				System.out.println("Find Best Finger: 2nd case!");
+			}
+		}
+
+		return bestPeer;
 	}
 
 }

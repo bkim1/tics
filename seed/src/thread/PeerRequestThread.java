@@ -1,13 +1,12 @@
 package thread;
 
-
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
-import java.lang.Long;
+import java.util.Map;
 
 import node.Node;
 import object.Message;
@@ -59,7 +58,7 @@ public class PeerRequestThread implements Runnable {
 			break;
 
 		//sent by newly joined predecessor looking for files
-		case FILE_REC:
+		case FILE_REQ:
 			fileRequest();
 			break;
 
@@ -97,9 +96,9 @@ public class PeerRequestThread implements Runnable {
 		//if current node is the affected node, go through finger table and replace out-of-date entries
 		if(msg.getFound()) {
 			Peer[] fingerTable = node.getFingerTable();
-			long nodeHash = node.getPeerId();
+			int nodeHash = node.getPeerId();
 			Peer join = msg.getPeer();
-			long key = msg.getKey();
+			int key = msg.getKey();
 			for(int i = 0; i < fingerTable.length; i++) {
 				//if the new node's hash is a successor of node n + 2^i and is smaller than the 
 				//current corresponding figure, the old finger is replaced with the new node
@@ -142,7 +141,7 @@ public class PeerRequestThread implements Runnable {
 	 * key = hash of origin node + 2^fingerIndex mod 2^60
 	 */
 	public void join() {
-		//long key = msg.getKey();
+		//int key = msg.getKey();
 		Peer finger = msg.getFinger();
 		//if the finger does not equal the current node, then the finger is an entry of the
 		//current node's finger table
@@ -198,9 +197,9 @@ public class PeerRequestThread implements Runnable {
 		Peer myPeer = this.node.getPeerObject();
 		Map<String, PeerData> files = this.node.getPeerFiles();
 		for ( String key : files.keySet() ) {
-			long lkey = Long.parseLong(key);
+			int lkey = Integer.parseInt(key);
 			if (lkey < newNode.getKey()) {
-				Message resp = new Message(FILE_RESP, myPeer, lkey, files.get(key));
+				Message resp = new Message(ReqType.FILE_RESP, myPeer, lkey, files.get(key).getData());
 				tcpSend(resp, newNode.getIP(), newNode.getPort());
 			}
 		}
@@ -210,7 +209,7 @@ public class PeerRequestThread implements Runnable {
 		Peer sender = this.msg.getPeer();
 		PeerData file = new PeerData(this.msg.getKey(), this.msg.getData());
 		this.node.addPeerFile(file);
-		Message ack = new Message(FILE_ACK, this.node.getPeerObject(), file.getKey());
+		Message ack = new Message(ReqType.FILE_ACK, this.node.getPeerObject(), file.getKey());
 		tcpSend(ack, sender.getIP(), sender.getPort());
 	}
 
@@ -219,7 +218,7 @@ public class PeerRequestThread implements Runnable {
 	}
 	
 	/*
-	public void sendFile(Peer peer, Long key) {
+	public void sendFile(Peer peer, int key) {
 		PeerData data = this.node.getPeerData(key);
 		if(data != null) {
 			try {
@@ -242,6 +241,4 @@ public class PeerRequestThread implements Runnable {
 		}
 	}*/
 	
-	
-
 }
