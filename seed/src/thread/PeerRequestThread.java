@@ -58,7 +58,7 @@ public class PeerRequestThread implements Runnable {
 			break;
 
 		//sent by newly joined predecessor looking for files
-		case FILE_REC:
+		case FILE_REQ:
 			fileRequest();
 			break;
 

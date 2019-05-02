@@ -24,17 +24,17 @@ import static utils.Constants.RING_SIZE_BYTES;
 
 public class Utilities {
 
-	public static Peer lookUp(Message msg, Peer[] fingerTable, long selfKey) {
+	public static Peer lookUp(Message msg, Peer[] fingerTable, int selfKey) {
 		Peer finger = null;
 		int length = fingerTable.length;
 		
 		for(int i = 0; i < length; i++) {
 			finger = fingerTable[i];
-			long nodeKey = finger.getKey();
-			long targetKey = msg.getKey();
+			int nodeKey = finger.getKey();
+			int targetKey = msg.getKey();
 
-			System.out.println("Node Key: " + Long.toString(nodeKey));
-			System.out.println("Target Key: " + Long.toString(targetKey));
+			System.out.println("Node Key: " + Integer.toString(nodeKey));
+			System.out.println("Target Key: " + Integer.toString(targetKey));
 			/*
 			if(finger.equals(msg.getPeer())) {
 				return null;
@@ -141,10 +141,10 @@ public class Utilities {
 	}
 	
 	public void generateFingerTable(Peer[] init, Peer sender) {
-		long peerID = sender.getKey();
+		int peerID = sender.getKey();
 		for(int i = 0; i < init.length; i++) {
 			//each entry is denoted by the hash of the node + 2^index of the finger table
-			long targetKey = getFingerTableThreshold(peerID, i);
+			int targetKey = getFingerTableThreshold(peerID, i);
 			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
 			msg.setFingerIndex(i);
 			msg.setFinger(sender);
@@ -156,9 +156,9 @@ public class Utilities {
 	
 	public static void adjustFingerTable(Node node, Peer peer) {
 		Peer[] fingerTable = node.getFingerTable();
-		long currentKey = node.getPeerId();
-		long peerKey = peer.getKey();
-		long threshold;
+		int currentKey = node.getPeerId();
+		int peerKey = peer.getKey();
+		int threshold;
 
 		for (int i = 0; i < fingerTable.length; i++) { 
 			// Empty fingerTable --> Assign peer and skip over rest
@@ -195,9 +195,9 @@ public class Utilities {
 		node.updateFingerTable(fingerTable);
 	}
 
-	public static long getFingerTableThreshold(long currentKey, int index) {
-		long sum = currentKey + (long) Math.pow(2, index);
-		long remainder = sum % (long) Math.pow(2, RING_SIZE);
+	public static int getFingerTableThreshold(int currentKey, int index) {
+		int sum = currentKey + (int) Math.pow(2, index);
+		int remainder = sum % (int) Math.pow(2, RING_SIZE);
 		return remainder;
 	}
 
