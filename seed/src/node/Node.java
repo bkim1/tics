@@ -115,6 +115,15 @@ public class Node {
             this.printFingerTable();
         }
     }
+    public void updateFingerTable(Peer[] fingerTable, boolean print) {
+        synchronized(fingerTableLock){
+            this.fingerTable = fingerTable;
+
+            System.out.println("Finger Table has been updated!");
+            System.out.println("Updated version: ");
+            if (print) { this.printFingerTable(); }
+        }
+    }
     public void updateFingerTable(Peer peer, int index) {
         synchronized(fingerTableLock) {
             this.fingerTable[index] = peer;

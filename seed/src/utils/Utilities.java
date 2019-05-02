@@ -156,6 +156,11 @@ public class Utilities {
 	
 	public static void adjustFingerTable(Node node, Peer peer) {
 		Peer[] fingerTable = node.getFingerTable();
+		Peer[] originalTable = Arrays.copyOf(fingerTable, fingerTable.length);
+
+		if (fingerTable == null) {
+			fingerTable = new Peer[RING_SIZE];
+		}
 		int currentKey = node.getPeerId();
 		int peerKey = peer.getKey();
 		int threshold;
@@ -173,32 +178,60 @@ public class Utilities {
 
 			// Standard case for inserting new node
 			// When new node's key is less than the finger's key
-			if (threshold <= peerKey && finger.getKey() > peerKey) {
+			if (threshold > finger.getKey() && peerKey >= threshold) {
+				shiftTableRight(fingerTable, i);
+				fingerTable[i] = findBestFinger(currentKey, threshold, originalTable, peer);
+			}
+			else if (threshold <= peerKey && finger.getKey() > peerKey) {
 				System.out.println("Standard Case hit!");
 				// Shift nodes to the right for new entry
-				for (int j = i + 1; j < fingerTable.length; j++) {
-					fingerTable[j] = fingerTable[j - 1];
-				}
-				fingerTable[i] = peer;
+				shiftTableRight(fingerTable, i);
+				fingerTable[i] = findBestFinger(currentKey, threshold, originalTable, peer);
 			}
 			// Case for when it loops around the ring
 			else if (finger.getKey() < threshold &&
 					 (peerKey < finger.getKey() || peerKey >= threshold)) {
 				System.out.println("Edge case hit!");
 				// Shift nodes to the right for new entry
-				for (int j = i + 1; j < fingerTable.length; j++) {
-					fingerTable[j] = fingerTable[j - 1];
-				}
-				fingerTable[i] = peer;	
+				shiftTableRight(fingerTable, i);
+				fingerTable[i] = findBestFinger(currentKey, threshold, originalTable, peer);	
 			}
 		}
 		node.updateFingerTable(fingerTable);
 	}
 
 	public static int getFingerTableThreshold(int currentKey, int index) {
-		int sum = currentKey + (int) Math.pow(2, index);
+		int sum = currentKey + ((int) Math.pow(2, index + 1) - 1);
 		int remainder = sum % (int) Math.pow(2, RING_SIZE);
 		return remainder;
+	}
+
+	public static void shiftTableRight(Peer[] fingerTable, int index) {
+		for (int j = index + 1; j < fingerTable.length; j++) {
+			fingerTable[j] = fingerTable[j - 1];
+		}
+	}
+
+	public static Peer findBestFinger(int currentKey, int threshold, Peer[] fingerTable, Peer peer) {
+		Peer bestPeer = peer;
+		System.out.println("\nEntered findBestFinger\n");
+
+		for (int i = 0; i < fingerTable.length; i++) {
+			Peer p = fingerTable[i];
+			System.out.println("Finger: " + p.getKey() + " Peer: " + peer.getKey());
+			if (threshold <= p.getKey() && threshold <= peer.getKey() &&
+					p.getKey() - threshold < peer.getKey() - threshold) {
+				bestPeer = p;
+				System.out.println("Find Best Finger: 1st case!");
+			}
+			else if (threshold > p.getKey() && threshold > peer.getKey() &&
+					 threshold - p.getKey() > threshold - peer.getKey()) {
+				bestPeer = p;
+				System.out.println("Find Best Finger: 2nd case!");
+			}
+		}
+
+		return bestPeer;
 	}
 
 }
