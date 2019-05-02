@@ -118,6 +118,12 @@ public class StabilizeThread implements Runnable {
 
     public void fixFingerInit() {
         Peer[] fingerTable = this.node.getFingerTable();
+        if (fingerTable == null) {
+            return;
+        }
+        else if (fingerTable[0] == null) {
+            return;
+        }
         Random rand = new Random();
         int i = rand.nextInt(fingerTable.length-1); // pick any but the last b/c checking their successor
         Peer finger = fingerTable[i];
