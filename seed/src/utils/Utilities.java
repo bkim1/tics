@@ -81,9 +81,7 @@ public class Utilities {
 			digest.update(ip.toString().getBytes(Charset.forName("UTF-8")));
 			digest.update(Integer.valueOf(port).byteValue());
 			Byte bits = digest.digest()[RING_SIZE];
-			System.out.println(bits);
 			key = bits.intValue();
-			System.out.println("Int Key: " + key);
 			
 			if (key < 0) { key = -key; }
 		} catch (NoSuchAlgorithmException e) {

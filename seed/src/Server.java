@@ -48,6 +48,7 @@ public class Server {
     }
 
     public void run() throws IOException {
+        this.printWelcomeMessage();
         try {
             while (true) {
                 Socket socket = this.serverSocket.accept();
@@ -124,6 +125,19 @@ public class Server {
         }
     }
 
+    private void printWelcomeMessage() {
+        System.out.println(
+            "**************************************\n" +
+            "****  _____ ______ ______ _____   ****\n" +
+            "**** / ____|  ____|  ____|  __    ****\n" +
+            "****| (___ | |__  | |__  | |  | | ****\n" +
+            "****  ___ ||  __| |  __| | |  | | ****\n" +
+            "**** ____) | |____| |____| |__| | ****\n" +
+            "**** |_____/|______|______|_____/ ****\n" +
+            "****                              ****\n" +
+            "**************************************\n\n"
+        );
+    }
     public static void main(String[] args) throws IOException, InterruptedException {
         int serverPort = 0;
         boolean isFirst = false;

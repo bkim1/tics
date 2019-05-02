@@ -11,6 +11,6 @@ public final class Constants {
     public static final int MIN_PORT = 1024;
     public static final int MAX_PORT = 49151;
 
-    public static final String ENTRY_ADDRESS = "136.167.120.139";
+    public static final String ENTRY_ADDRESS = "127.0.0.1";
     public static final int ENTRY_PORT = 10000;
 }
