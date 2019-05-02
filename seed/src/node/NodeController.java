@@ -41,6 +41,10 @@ public class NodeController {
         return this.currentLookup.getOrDefault(Integer.toString(key), null);
     }
 
+    public void registerLookup(int key, FileInfo info) {
+        this.currentLookup.put(Integer.toString(key), info);
+    }
+
     public String getDownloadLoc() {
         return this.userProps.getProperty("downloadFileLoc");
     }

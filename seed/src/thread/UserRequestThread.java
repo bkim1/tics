@@ -15,17 +15,18 @@ import utils.Utilities;
 
 public class UserRequestThread implements Runnable {
     private NodeController nc;
+    private BufferedReader input;
 
     public UserRequestThread(NodeController nc) {
         this.nc = nc;
     }
     
 	public void run() {
+        this.input = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             System.out.println("Enter 1 for file upload, 2 for file retrieval, 3 for changing default directory, and 4 for Leaving Network");
-            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
             try {
-                int UsrIn = Integer.parseInt(input.readLine());
+                int UsrIn = Integer.parseInt(this.input.readLine());
                 
                 switch (UsrIn) {
                     case 1: upload();
@@ -49,21 +50,21 @@ public class UserRequestThread implements Runnable {
 
     public void upload(){ //using lookup method, forward along appropriately
         System.out.println("Enter the full local address of the file you wish to upload");
-        Scanner uploadScan = new Scanner(System.in);
-        String newFileLocation = uploadScan.nextLine();
-
-        int index = newFileLocation.lastIndexOf("/");
-        if (index == newFileLocation.length()-1) {
-            index = newFileLocation.lastIndexOf("/", index);
-        }
-
-        String newFileName = newFileLocation.substring(index + 1);
-        FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName); //register file info in nodecontroller
-        Peer peer = this.nc.getPeerObject();
-        Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
-        
-        // Get byte[] of file being requested
         try {
+            String newFileLocation = this.input.readLine();
+
+            int index = newFileLocation.lastIndexOf("/");
+            if (index == newFileLocation.length()-1) {
+                index = newFileLocation.lastIndexOf("/", index);
+            }
+
+            String newFileName = newFileLocation.substring(index + 1);
+            FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName); //register file info in nodecontroller
+            Peer peer = this.nc.getPeerObject();
+            Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
+            
+            // Get byte[] of file being requested
+        
             File file = new File(newFileLocation);
             FileInputStream fileInputStream = new FileInputStream(file);
             byte[] data = new byte[(int) file.length()];
@@ -71,26 +72,31 @@ public class UserRequestThread implements Runnable {
             fileInputStream.read(data);
             msg.setData(data);
             fileInputStream.close();
+
+            Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
+            this.nc.registerFileInfo(newFileInfo);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
     }
 
     public void initializeLookupRequest(){
         System.out.println("Enter the name of the file you wish to retrieve");
-        Scanner retrieveScan = new Scanner(System.in);
-        String requestedFileName = retrieveScan.nextLine();
-        retrieveScan.close();
-        Peer peer = this.nc.getPeerObject();
-        FileInfo requestFileInfo = this.nc.getRegisteredFileInfo(requestedFileName); //check if obj is null, bc then lookup can't proceed
-        if (requestFileInfo == null) {
-            System.out.println("Not a registered file. Please try again");
-            return;
+        try {
+            String requestedFileName = this.input.readLine();
+            Peer peer = this.nc.getPeerObject();
+            FileInfo requestFileInfo = this.nc.getRegisteredFileInfo(requestedFileName); //check if obj is null, bc then lookup can't proceed
+            if (requestFileInfo == null) {
+                System.out.println("Not a registered file. Please try again");
+                return;
+            }
+            Message msg = new Message(ReqType.LOOKUP, peer, requestFileInfo.getKey());
+            this.nc.registerLookup(requestFileInfo.getKey(), requestFileInfo);
+            Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        Message msg = new Message(ReqType.LOOKUP, peer, requestFileInfo.getKey());
-        Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
     }
 
     public void changeDefaultDownloadDirectory(){
