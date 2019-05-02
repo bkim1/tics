@@ -15,6 +15,8 @@ public class Message implements Serializable {
     private Peer finger;
     private int fingerIndex;
     private Peer[] updatedPeers;
+    private PeerData[] transferFiles;
+    private int[] transferKeys;
     private boolean isFound = false;
 
     public Message(ReqType msgType, Peer peer, int key, byte[] data) {
@@ -22,6 +24,18 @@ public class Message implements Serializable {
         this.peer = peer;
         this.key = key;
         this.data = data;
+    }
+
+    public Message(ReqType msgType, Peer peer, PeerData[] files) {
+        this.msgType = msgType;
+        this.peer = peer;
+        this.transferFiles = files;
+    }
+
+    public Message(ReqType msgType, Peer peer, int[] keys) {
+        this.msgType = msgType;
+        this.peer = peer;
+        this.transferKeys = keys;
     }
 
     public Message(ReqType msgType, Peer peer) {
@@ -65,6 +79,12 @@ public class Message implements Serializable {
 
     public Peer[] getUpdatedPeers() { return this.updatedPeers; }
     public void setUpdatedPeers(Peer[] updatedPeers) { this.updatedPeers = updatedPeers; }
+
+    public PeerData[] getTransferFiles() { return this.transferFiles; }
+    public void setTransferFiles(PeerData[] files) { this.transferFiles = files; }
+
+    public int[] getTransferKeys() { return this.transferKeys; }
+    public void setTransferKeys(int[] keys) { this.transferKeys = keys; }
 
     public String toString() { return objToString(this); }
 }

@@ -196,25 +196,36 @@ public class PeerRequestThread implements Runnable {
 		Peer newNode = this.msg.getPeer();
 		Peer myPeer = this.node.getPeerObject();
 		Map<String, PeerData> files = this.node.getPeerFiles();
+		PeerData[] transferFiles = new PeerData[files.size()];
+		int i = 0;
 		for ( String key : files.keySet() ) {
 			int lkey = Integer.parseInt(key);
 			if (lkey < newNode.getKey()) {
-				Message resp = new Message(ReqType.FILE_RESP, myPeer, lkey, files.get(key).getData());
-				tcpSend(resp, newNode.getIP(), newNode.getPort());
+				transferFiles[i] = files.get(key);
+				i++;
 			}
 		}
+		Message resp = new Message(ReqType.FILE_RESP, myPeer, transferFiles);
+		tcpSend(resp, newNode.getIP(), newNode.getPort());
 	}
 
 	public void fileResponse() {
 		Peer sender = this.msg.getPeer();
-		PeerData file = new PeerData(this.msg.getKey(), this.msg.getData());
-		this.node.addPeerFile(file);
-		Message ack = new Message(ReqType.FILE_ACK, this.node.getPeerObject(), file.getKey());
+		PeerData[] files = this.msg.getTransferFiles();
+		int[] keys = new int[files.length];
+		int i = 0;
+		for (PeerData file : files) {
+			this.node.addPeerFile(file);
+			keys[i] = file.getKey();
+		}
+		Message ack = new Message(ReqType.FILE_ACK, this.node.getPeerObject(), keys);
 		tcpSend(ack, sender.getIP(), sender.getPort());
 	}
 
 	public void fileAck() {
-		this.node.removePeerFile(this.msg.getKey());
+		for (int key : this.msg.getTransferKeys()) {
+			this.node.removePeerFile(key);
+		}
 	}
 	
 	/*
