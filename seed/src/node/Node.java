@@ -20,7 +20,6 @@ public class Node {
     private Map<String, FileInfo> myFiles;
     
     private static Object addressLock = new Object();
-    private static Object peerLock = new Object();
     private static Object peerFilesLock = new Object();
     private static Object fingerTableLock = new Object();
     private static Object myFilesLock = new Object();
@@ -74,30 +73,32 @@ public class Node {
     }
 
     public Peer getPeerObject() {
-        synchronized(peerLock) {
+        synchronized(addressLock) {
             return new Peer(this.ip, this.port, this.peerId);
         }
     }
 
     public Peer getSuccessor() {
-        synchronized(peerLock) {
+        synchronized(fingerTableLock) {
             return this.fingerTable[0];
         }
     }
     public void setSuccessor(Peer p) {
         synchronized(fingerTableLock) {
             this.fingerTable[0] = p;
+            this.printFingerTable();
         }
     }
 
     public Peer getPredecessor() {
-        synchronized(peerLock) {
+        synchronized(fingerTableLock) {
             return this.predecessor;
         }
     }
     public void setPredecessor(Peer p) {
-        synchronized(peerLock) {
+        synchronized(fingerTableLock) {
             this.predecessor = p; 
+            this.printFingerTable();
         }
     }
 
