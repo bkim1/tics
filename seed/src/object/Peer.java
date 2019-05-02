@@ -48,7 +48,7 @@ public class Peer implements Serializable {
     }
 
     public String toCondensedString() {
-        return "Peer[" + this.key + ", " + this.ip + ", " + this.port + "]";
+        return "Peer[" + this.key + ", " + this.ip.getHostAddress() + ", " + this.port + "]";
     }
 
     public String toString() { return objToString(this); }
