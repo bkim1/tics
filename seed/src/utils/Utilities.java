@@ -43,7 +43,7 @@ public class Utilities {
 			//the target node is found if the keys are equal or 
 			//if the first entry on the finger table is the closest successor to the target key
 			if(nodeKey == targetKey || 
-			   (i == 0 && selfKey < nodeKey && nodeKey < targetKey)) {
+			   (i == 0 && selfKey < nodeKey && targetKey < nodeKey)) {
 				msg.setFound();
 				break;
 			}
@@ -142,16 +142,16 @@ public class Utilities {
 	
 	public void generateFingerTable(Peer[] init, Peer sender) {
 		int peerID = sender.getKey();
-		for(int i = 0; i < init.length; i++) {
+		//for(int i = 0; i < init.length; i++) {
 			//each entry is denoted by the hash of the node + 2^index of the finger table
-			int targetKey = getFingerTableThreshold(peerID, i);
+			int targetKey = getFingerTableThreshold(peerID, 0);
 			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
-			msg.setFingerIndex(i);
+			msg.setFingerIndex(0);
 			msg.setFinger(sender);
 			//perform lookUp on node n + 2^index
 			lookUp(msg, init, peerID);
-			System.out.println("Searching for " + i + "th entry in finger table...");
-		}
+			System.out.println("Searching for 1st entry in finger table...");
+		//}
 	}
 	
 	public static void adjustFingerTable(Node node, Peer peer) {
