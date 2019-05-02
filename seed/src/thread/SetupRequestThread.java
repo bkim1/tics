@@ -10,10 +10,12 @@ import node.Node;
 import object.Message;
 import object.Peer;
 import object.ReqType;
+import utils.Utilities;
 
 
 public class SetupRequestThread implements Runnable {
     private Node node;
+    private Peer peer;
     private Socket socket;
     private InputStream inputStream;
     private OutputStream outputStream;
@@ -21,10 +23,11 @@ public class SetupRequestThread implements Runnable {
 
     public SetupRequestThread(Node node, Message msg) {
         this.node = node;
-        Peer peer = msg.getPeer();
-        
+        this.peer = msg.getPeer();
+        System.out.println(this.peer);
+        System.out.println(this.node);
         try {
-            this.socket = new Socket(peer.getIP(), peer.getPort());
+            this.socket = new Socket(this.peer.getIP(), this.peer.getPort());
             this.inputStream = this.socket.getInputStream();
             this.outputStream = this.socket.getOutputStream();
         } catch(IOException e) {
@@ -47,6 +50,9 @@ public class SetupRequestThread implements Runnable {
             objOutputStream.flush();
             objOutputStream.writeObject(msg);
             objOutputStream.flush();
+
+            // Adjust finger table of current node if necessary
+            Utilities.adjustFingerTable(this.node, this.peer);
             
             System.out.println("Sent finger table... Shutting down thread.");
             this.socket.close();
