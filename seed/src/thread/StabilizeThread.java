@@ -34,6 +34,9 @@ public class StabilizeThread implements Runnable {
             case STABILIZE_PRED_SET:
                 handleStabilzePredSet(msg);
                 break;
+            case STABILIZE_SUCC_SET:
+                handleStabilzeSuccSet(msg);
+                break;
             case SUCCESSOR_REQ:
                 handleSuccReq(msg);
                 break;
@@ -67,8 +70,14 @@ public class StabilizeThread implements Runnable {
     private void handleStabilzeReq(Message msg) {
         Peer sender = msg.getPeer();
         Peer pred = this.node.getPredecessor();
+        Peer myPeer = this.node.getPeerObject();
         if (pred == null) {
             this.node.setPredecessor(sender);
+            pred = sender;
+        }
+        else if (myPeer.getKey() < pred.getKey() && myPeer.getKey() < sender.getKey() &&
+            pred.getKey() - myPeer.getKey() > sender.getKey() - myPeer.getKey()) {
+                this.node.setPredecessor(sender);
         }
         else if (sender.getKey() > pred.getKey()) {  // sender is closer to node than the listed predecessor
             this.node.setPredecessor(sender);
@@ -109,6 +118,28 @@ public class StabilizeThread implements Runnable {
             }
             return;
         }
+        else if (successorPred.getKey() < myPeer.getKey()) {
+            if (this.node.getPredecessor() == null) {
+                this.node.setPredecessor(successorPred);
+            }
+            else if (this.node.getPredecessor().getKey() < successorPred.getKey()) {
+                this.node.setPredecessor(successorPred);
+            }
+            Message notify = new Message(ReqType.STABILIZE_SUCC_SET, myPeer);  // notify succcessor's predecessor to update its predecessor to this node
+            try {
+                InetAddress address = successorPred.getIP();
+                int port = successorPred.getPort();
+                Socket socket = new Socket(address, port);
+                OutputStream os = socket.getOutputStream(); 
+                ObjectOutputStream oos = new ObjectOutputStream(os);
+                oos.flush();
+                oos.writeObject(notify);
+                oos.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
     }
 
     private void handleStabilzePredSet(Message msg) {
@@ -119,6 +150,18 @@ public class StabilizeThread implements Runnable {
         }
         else if (newPred.getKey() > pred.getKey()) {
             this.node.setPredecessor(newPred);
+        }
+        return;
+    }
+
+    private void handleStabilzeSuccSet(Message msg) {
+        Peer newSuc = msg.getPeer();
+        Peer suc = this.node.getSuccessor();
+        if (suc == null) {
+            this.node.setSuccessor(newSuc);
+        }
+        else if (newSuc.getKey() < suc.getKey()) {
+            this.node.setSuccessor(newSuc);
         }
         return;
     }

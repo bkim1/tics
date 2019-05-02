@@ -81,6 +81,7 @@ public class ForwardRequestThread implements Runnable {
             case STABILIZE_PRED_REQ:
             case STABILIZE_PRED_RESP:
             case STABILIZE_PRED_SET:
+            case STABILIZE_SUCC_SET:
             case SUCCESSOR_REQ:
             case SUCCESSOR_RESP:
                 this.stabilizeThread.executeMsg(msg);
