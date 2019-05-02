@@ -61,6 +61,7 @@ public class InitializeThread implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.node.setPredecessor(this.node.getFingerTable()[this.node.getFingerTable().length - 1]);
         System.out.println("Initialize: DONE!");
     }
 

@@ -15,23 +15,12 @@ import node.*;
 public class ReceiveFileThread implements Runnable {
     private Message msg;
     private NodeController nc;
-    private Socket socket;
-    private InputStream inputStream;
-    private OutputStream outputStream;
     private String downloadLoc;
     private FileInfo info;
 
-    public ReceiveFileThread(Message msg, NodeController nc, Socket peerSocket) {
+    public ReceiveFileThread(Message msg, NodeController nc) {
         this.msg = msg;
         this.nc = nc;
-        this.socket = peerSocket;
-        
-        try {
-            this.inputStream = this.socket.getInputStream();
-            this.outputStream = this.socket.getOutputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         this.downloadLoc = this.nc.getDownloadLoc();
     }
     
@@ -49,7 +38,7 @@ public class ReceiveFileThread implements Runnable {
     }
 
     private FileInfo getFile() throws IOException {
-        String absFileName = this.downloadLoc + this.nc.getFilename(this.msg.getKey());
+        String absFileName = this.downloadLoc + "output-" + this.nc.getFilename(this.msg.getKey());
         File outputFile = new File(absFileName);
         outputFile.createNewFile();
         FileOutputStream writer = new FileOutputStream(outputFile);
@@ -57,17 +46,16 @@ public class ReceiveFileThread implements Runnable {
         byte[] data = this.msg.getData();
         writer.write(data);
 
-        System.out.println("Downloaded  the file!");
+        System.out.println("Downloaded the file!");
         writer.flush();
         writer.close();
         
         // int numRetry = 0;
-        FileInfo info = this.nc.getLookupFileInfo(this.msg.getKey());
+        this.info = this.nc.getLookupFileInfo(this.msg.getKey());
         // while (info == null && numRetry > 3) {
         //     Message retryMsg = new Message(ReqType.SEND_FAIL, this.nc.getPeerObject());
         // }
-        this.socket.close();
-        return info;
+        return this.info;
     }
 
     private boolean verify(FileInfo info) {

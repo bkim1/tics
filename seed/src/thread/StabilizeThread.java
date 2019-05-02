@@ -69,6 +69,7 @@ public class StabilizeThread implements Runnable {
 
     private void handleStabilzeReq(Message msg) {
         Peer sender = msg.getPeer();
+        if (sender == null) { return; }
         Peer pred = this.node.getPredecessor();
         Peer myPeer = this.node.getPeerObject();
         if (pred == null) {
