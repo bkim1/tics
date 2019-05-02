@@ -71,7 +71,7 @@ public class StabilizeThread implements Runnable {
         else if (sender.getKey() > pred.getKey()) {  // sender is closer to node than the listed predecessor
             this.node.setPredecessor(sender);
         }
-        Message resp = new Message(ReqType.STABILIZE_PRED_REQ, pred);
+        Message resp = new Message(ReqType.STABILIZE_PRED_RESP, pred);
         try {
             InetAddress address = sender.getIP();
             int port = sender.getPort();
