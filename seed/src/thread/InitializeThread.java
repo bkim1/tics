@@ -43,8 +43,8 @@ public class InitializeThread implements Runnable {
 
     public void run() {
         System.out.println("Attempting to enter network");
-        this.sendSetupMessage();
         this.setupServerSocket();
+        this.sendSetupMessage();
         Peer[] initTable = this.getInitialFingerTable();
 
         this.updateFingerTable(initTable);
@@ -53,15 +53,17 @@ public class InitializeThread implements Runnable {
         // Use Node's actual server address
 
         try {
+            this.socket.close();
             this.servSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Initialize: DONE!");
     }
 
     private void sendSetupMessage() {
         Peer currentPeer = this.node.getPeerObject();
-        currentPeer.setPort(this.servPort);
+        currentPeer.setSetupPort(this.servPort);
         Message setupMsg = new Message(ReqType.SETUP, currentPeer);
 
         try {
@@ -84,7 +86,6 @@ public class InitializeThread implements Runnable {
     */
     private void setupServerSocket() {
         try {
-            this.socket.close();
             this.servSocket = new ServerSocket(this.servPort);
         } catch (IOException e) {
             e.printStackTrace();
@@ -94,6 +95,7 @@ public class InitializeThread implements Runnable {
     private Peer[] getInitialFingerTable() {
         Peer[] initFingerTable = null;
         try {
+            System.out.println("Initialize: Awaiting response...");
             Socket entrySocket = this.servSocket.accept();
 
             // Get SETUP_RESP message from entry point
@@ -140,9 +142,5 @@ public class InitializeThread implements Runnable {
             }
         }
         this.node.updateFingerTable(fingerTable);
-    }
-
-    private void notifyAffectedNodes() {
-
     }
 }
