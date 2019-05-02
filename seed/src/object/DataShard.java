@@ -11,13 +11,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
+import utils.Utilities;
+
 import static utils.Constants.RING_SIZE;
-import static utils.Utilities.objToString;
 
 public class DataShard implements Serializable {
     private static final long serialVersionUID = 674850213L;
 
-    private long key;
+    private int key;
     private String filename;
     private String hashedData;
 
@@ -25,17 +26,11 @@ public class DataShard implements Serializable {
         this.filename = filename;
 
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(this.filename.getBytes(Charset.forName("UTF-8")));
-            digest.update(salt);
-
-            byte[] buf = Arrays.copyOfRange(digest.digest(), 0, RING_SIZE);
-            ByteBuffer buffer = ByteBuffer.wrap(buf);
-            this.key = buffer.getLong();
-            digest.reset();
-
+            this.key = Utilities.generateFileKey(filename, salt);
+            
             int count;
-            buf = new byte[8192];
+            byte[] buf = new byte[8192];
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fileLoc));
             while((count = bis.read(buf)) > 0) {
                 digest.update(buf);
@@ -48,11 +43,11 @@ public class DataShard implements Serializable {
         }
     }
 
-    public long getKey() { return this.key; }
+    public int getKey() { return this.key; }
 
     public String getFilename() { return this.filename; }
 
     public String getHashedData() { return this.hashedData; }
 
-    public String toString() { return objToString(this); }
+    public String toString() { return Utilities.objToString(this); }
 }

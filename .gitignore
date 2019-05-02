@@ -14,7 +14,7 @@ venv/
 .idea/
 
 bin/
-.class
+*.class
 .classpath
 .project
 .settings

@@ -1,17 +1,16 @@
 package node;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 import object.*;
 import node.Node;
+import java.util.Scanner;
 
 public class NodeController {
     private Node node;
-    private Properties applicationProps;
+    private Properties userProps;
     private Map<String, FileInfo> currentLookup;
     
     public NodeController(Node node) throws IOException {
@@ -20,34 +19,42 @@ public class NodeController {
 
         // Setup and load default properties
         Properties defaultProps = new Properties();
-        FileInputStream in = new FileInputStream(".defaultProps");
+        FileInputStream in = new FileInputStream(System.getProperty("user.dir") + "/.defaultProps");
         defaultProps.load(in);
         in.close();
 
-        // Setup and load application properties
-        applicationProps = new Properties(defaultProps);
-        in = new FileInputStream(".applicationProps");
-        applicationProps.load(in);
+        // Setup and load user properties on top of defaults
+        userProps = new Properties(defaultProps);
+        in = new FileInputStream(System.getProperty("user.dir") + "/.userProps");
+        userProps.load(in);
         in.close();
     }
 
     public Node getNode() { return this.node; }
 
-    public void addLookup(long key, FileInfo info) {
-        String strKey = Long.toString(key);
+    public void addLookup(int key, FileInfo info) {
+        String strKey = Integer.toString(key);
         this.currentLookup.put(strKey, info);
     }
 
-    public FileInfo getLookupFileInfo(long key) {
-        return this.currentLookup.getOrDefault(Long.toString(key), null);
+    public FileInfo getLookupFileInfo(int key) {
+        return this.currentLookup.getOrDefault(Integer.toString(key), null);
     }
 
     public String getDownloadLoc() {
-        return this.applicationProps.getProperty("downloadFileLoc");
+        return this.userProps.getProperty("downloadFileLoc");
     }
 
-    public String getSaveLoc() {
-        return this.applicationProps.getProperty("saveStateLoc");
+    public Object setDownloadLoc() {
+        System.out.println("Enter the full address of the folder to which you want to download to");
+        Scanner changeDirScan = new Scanner(System.in);
+        String requestedDirectory = changeDirScan.nextLine();
+        changeDirScan.close();
+        return this.userProps.setProperty("downloadFileLoc", requestedDirectory);
+    }
+
+    public String getSaveStateLoc() {
+        return this.userProps.getProperty("saveStateLoc");
     }
 
     public Peer getPeerObject() {
@@ -59,7 +66,7 @@ public class NodeController {
         return this.node.getFingerTable();
     }
     
-    public PeerData getPeerFiles(long key) {
+    public PeerData getPeerFiles(int key) {
         return this.node.getPeerData(key);
     }
 
@@ -67,8 +74,8 @@ public class NodeController {
         return this.node.getSuccessor();
     }
 
-    public String getFilename(long key) {
-        String strKey = Long.toString(key);
+    public String getFilename(int key) {
+        String strKey = Integer.toString(key);
         FileInfo info = this.currentLookup.get(strKey);
 
         return info.getFilename();
@@ -83,5 +90,5 @@ public class NodeController {
         return true;
     }
 
-    public long getPeerId() { return this.node.getPeerId(); }
+    public int getPeerId() { return this.node.getPeerId(); }
 }

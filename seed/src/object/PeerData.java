@@ -7,16 +7,16 @@ import static utils.Utilities.objToString;
 public class PeerData implements Serializable {
     private static final long serialVersionUID = 1001100L;
 
-    private long key;
+    private int key;
     private byte[] data;
 
-    public PeerData(long key, byte[] data) {
+    public PeerData(int key, byte[] data) {
         this.key = key;
         this.data = data;
     }
 
-    public long getKey() { return this.key; }
-    public void setKey(long key) { this.key = key; }
+    public int getKey() { return this.key; }
+    public void setKey(int key) { this.key = key; }
 
     public byte[] getData() { return this.data; }
     public void setData(byte[] data) { this.data = data; }
