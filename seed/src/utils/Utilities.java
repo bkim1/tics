@@ -14,6 +14,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import node.Node;
+
 import java.io.File;
 
 import object.*;
@@ -75,6 +78,7 @@ public class Utilities {
 			byte[] bytes = Arrays.copyOfRange(digest.digest(), 0, RING_SIZE);
 			ByteBuffer buffer = ByteBuffer.wrap(bytes);
 			key = buffer.getLong();
+			// System.out.println("Int Key: " + Integer.toString(buffer.getInt()));
 			
 			if (key < 0) { 
 				key = -key;
@@ -129,6 +133,25 @@ public class Utilities {
 			//perform lookUp on node n + 2^index
 			lookUp(msg, init, peerID);
 			System.out.println("Searching for " + i + "th entry in finger table...");
+		}
+	}
+
+	public static void adjustFingerTable(Node node, Peer peer) {
+		Peer[] fingerTable = node.getFingerTable();
+		long peerKey = peer.getKey();
+
+		for (int i = 0; i < fingerTable.length - 1; i++) {
+			Peer finger = fingerTable[i];
+			if (finger == null) {
+				fingerTable[i] = peer;
+			}
+			else if (finger.getKey() > peerKey) {
+				// Shift nodes to the right for new entry
+				for (int j = i + 1; j < fingerTable.length; j++) {
+					fingerTable[j] = fingerTable[j - 1];
+				}
+				fingerTable[i] = peer;
+			}
 		}
 	}
 
