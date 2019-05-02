@@ -47,6 +47,7 @@ public class StabilizeThread implements Runnable {
 
     public void stabilzeInit() {
         Peer successor = this.node.getSuccessor();
+        if (successor == null) { return; }
         Message msg = new Message(ReqType.STABILIZE_PRED_REQ, successor);    // request successor's listed predecessor
         try {
             InetAddress address = successor.getIP();

@@ -42,9 +42,9 @@ public class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(saveRunnable));
 
         // Add continuous execution of Stabilization protocol
-        // Runnable stabilizeRunnable = new StabilizeThread(this.node);
-        // ScheduledThreadPoolExecutor stabilizeSchedExec = new ScheduledThreadPoolExecutor(1);
-        // stabilizeSchedExec.scheduleAtFixedRate(stabilizeRunnable, 0, 5, TimeUnit.MINUTES);
+        Runnable stabilizeRunnable = new StabilizeThread(this.node);
+        ScheduledThreadPoolExecutor stabilizeSchedExec = new ScheduledThreadPoolExecutor(1);
+        stabilizeSchedExec.scheduleAtFixedRate(stabilizeRunnable, 0, 1, TimeUnit.MINUTES);
     }
 
     public void run() throws IOException {
