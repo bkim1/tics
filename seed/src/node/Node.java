@@ -149,7 +149,7 @@ public class Node {
                 finger = "";
             }
             else {
-                finger = this.fingerTable[i].toString();
+                finger = this.fingerTable[i].toCondensedString();
             }
             sb.append(Integer.toString(i) + ": " + finger + "\n");
             sb.append("-------------------------\n");
