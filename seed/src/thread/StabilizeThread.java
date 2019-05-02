@@ -20,6 +20,7 @@ public class StabilizeThread implements Runnable {
     
     public void run() {
         System.out.println("Stabilize Thread starting...");
+        stabilzeInit();
     }
 
     public void executeMsg(Message msg) {
