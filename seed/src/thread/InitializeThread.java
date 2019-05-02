@@ -50,7 +50,7 @@ public class InitializeThread implements Runnable {
         this.updateFingerTable(initTable);
 
         // Call Rocky's Utility function
-        // Use Node's actual server
+        // Use Node's actual server address
 
         try {
             this.servSocket.close();
