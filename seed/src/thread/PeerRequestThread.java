@@ -48,7 +48,7 @@ public class PeerRequestThread implements Runnable {
 		
 		//sent by joining node to nodes whose finger tables may be affected by new node
 		//in order to update
-		case SETUP:
+		case AFFECTED_JOIN:
 			setUp();
 			break;
 		
@@ -143,12 +143,18 @@ public class PeerRequestThread implements Runnable {
 	public void join() {
 		//int key = msg.getKey();
 		Peer finger = msg.getFinger();
+		Peer selfPeer = node.getPeerObject();
 		//if the finger does not equal the current node, then the finger is an entry of the
 		//current node's finger table
-		if(!finger.equals(node.getPeerObject())) {
+		if(!finger.equals(selfPeer)) {
 			int index = msg.getFingerIndex();
-			node.updateFingerTable(finger, msg.getFingerIndex());
+			//node.updateFingerTable(finger, msg.getFingerIndex());
+			Utilities.adjustFingerTable(node, finger);
+			node.setSuccessor(finger);
+			Message fileRequest = new Message(ReqType.FILE_REQ, node.getPeerObject());
+			tcpSend(fileRequest, finger.getIP(), finger.getPort());
 			System.out.println("Finger table entry at index " + index + " updated to " + finger.getIP() + ".");
+			System.out.println("File transfer request sent to successor " + finger.getIP());
 		}
 		//if getFound() is true, then the current node is the target node
 		else if(msg.getFound()) {

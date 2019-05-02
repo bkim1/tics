@@ -43,7 +43,8 @@ public class Utilities {
 			//the target node is found if the keys are equal or 
 			//if the first entry on the finger table is the closest successor to the target key
 			if(nodeKey == targetKey || 
-			   (i == 0 && selfKey < nodeKey && targetKey < nodeKey)) {
+			   (i == 0 && selfKey < nodeKey && targetKey < nodeKey) ||
+			   (selfKey < targetKey && selfKey > nodeKey && nodeKey < targetKey)) {
 				msg.setFound();
 				break;
 			}
