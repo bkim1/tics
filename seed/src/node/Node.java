@@ -166,6 +166,13 @@ public class Node {
         }
     }
 
+    public void removePeerFile(long key) {
+        String strKey = Long.toString(key);
+        synchronized(peerFilesLock) {
+            this.peerFiles.remove(strKey);
+        }
+    }
+
     public void setPeerFiles(Map<String, PeerData> peerFiles) { 
         synchronized(peerFilesLock) {
             this.peerFiles = peerFiles;
@@ -180,6 +187,12 @@ public class Node {
     public void addFile(FileInfo file) {
         synchronized(myFilesLock) {
             this.myFiles.put(file.getFilename(), file);
+        }
+    }
+
+    public void removeFile(FileInfo file) {
+        synchronized(myFilesLock) {
+            this.myFiles.remove(file.getFilename());
         }
     }
 

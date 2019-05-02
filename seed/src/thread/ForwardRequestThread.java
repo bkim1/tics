@@ -64,7 +64,12 @@ public class ForwardRequestThread implements Runnable {
         
         System.out.println("ForwardReq: Got " + msg.getReqType() + " request!\n");
         switch(msg.getReqType()) {
-            case JOIN: case LOOKUP: case UPLOAD:
+            case JOIN:
+            case LOOKUP:
+            case UPLOAD:
+            case FILE_REQ:
+            case FILE_RESP:
+            case FILE_ACK:
                 PeerRequestThread prThread = new PeerRequestThread(msg, this.node);
                 t = new Thread(prThread);
                 this.socket.close();

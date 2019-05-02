@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
+import java.lang.Long;
 
 import node.Node;
 import object.Message;
@@ -55,6 +56,21 @@ public class PeerRequestThread implements Runnable {
 		//sent by nodes looking to upload a file	
 		case UPLOAD:
 			upload();
+			break;
+
+		//sent by newly joined predecessor looking for files
+		case FILE_REC:
+			fileRequest();
+			break;
+
+		//sent by successor with file to store
+		case FILE_RESP:
+			fileResponse();
+			break;
+
+		//sent by newly joined predecessor after rcving a file
+		case FILE_ACK:
+			fileAck();
 			break;
 		}
 	}
@@ -175,6 +191,31 @@ public class PeerRequestThread implements Runnable {
 		}
 		//not the correct node, continue lookup
 		return Utilities.lookUp(msg, this.node.getFingerTable(), this.node.getPeerId());
+	}
+
+	public void fileRequest() {
+		Peer newNode = this.msg.getPeer();
+		Peer myPeer = this.node.getPeerObject();
+		Map<String, PeerData> files = this.node.getPeerFiles();
+		for ( String key : files.keySet() ) {
+			long lkey = Long.parseLong(key);
+			if (lkey < newNode.getKey()) {
+				Message resp = new Message(FILE_RESP, myPeer, lkey, files.get(key));
+				tcpSend(resp, newNode.getIP(), newNode.getPort());
+			}
+		}
+	}
+
+	public void fileResponse() {
+		Peer sender = this.msg.getPeer();
+		PeerData file = new PeerData(this.msg.getKey(), this.msg.getData());
+		this.node.addPeerFile(file);
+		Message ack = new Message(FILE_ACK, this.node.getPeerObject(), file.getKey());
+		tcpSend(ack, sender.getIP(), sender.getPort());
+	}
+
+	public void fileAck() {
+		this.node.removePeerFile(this.msg.getKey());
 	}
 	
 	/*
