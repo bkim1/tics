@@ -20,13 +20,13 @@ public class NodeController {
 
         // Setup and load default properties
         Properties defaultProps = new Properties();
-        FileInputStream in = new FileInputStream(".defaultProps");
+        FileInputStream in = new FileInputStream(System.getProperty("user.dir") + "/.defaultProps");
         defaultProps.load(in);
         in.close();
 
         // Setup and load user properties on top of defaults
         userProps = new Properties(defaultProps);
-        in = new FileInputStream(".userProps");
+        in = new FileInputStream(System.getProperty("user.dir") + "/.userProps");
         userProps.load(in);
         in.close();
     }
