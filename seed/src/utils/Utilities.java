@@ -140,7 +140,7 @@ public class Utilities {
 		return result.toString();
 	}
 	
-	public void generateFingerTable(Peer[] init, Peer sender) {
+	public static void generateFingerTable(Peer[] init, Peer sender) {
 		int peerID = sender.getKey();
 		for(int i = 0; i < init.length; i++) {
 			//each entry is denoted by the hash of the node + 2^index of the finger table
@@ -158,9 +158,6 @@ public class Utilities {
 		Peer[] fingerTable = node.getFingerTable();
 		Peer[] originalTable = Arrays.copyOf(fingerTable, fingerTable.length);
 
-		if (fingerTable == null) {
-			fingerTable = new Peer[RING_SIZE];
-		}
 		int currentKey = node.getPeerId();
 		int peerKey = peer.getKey();
 		int threshold;
@@ -214,20 +211,16 @@ public class Utilities {
 
 	public static Peer findBestFinger(int currentKey, int threshold, Peer[] fingerTable, Peer peer) {
 		Peer bestPeer = peer;
-		System.out.println("\nEntered findBestFinger\n");
 
 		for (int i = 0; i < fingerTable.length; i++) {
 			Peer p = fingerTable[i];
-			System.out.println("Finger: " + p.getKey() + " Peer: " + peer.getKey());
 			if (threshold <= p.getKey() && threshold <= peer.getKey() &&
 					p.getKey() - threshold < peer.getKey() - threshold) {
 				bestPeer = p;
-				System.out.println("Find Best Finger: 1st case!");
 			}
 			else if (threshold > p.getKey() && threshold > peer.getKey() &&
 					 threshold - p.getKey() > threshold - peer.getKey()) {
 				bestPeer = p;
-				System.out.println("Find Best Finger: 2nd case!");
 			}
 		}
 

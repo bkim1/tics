@@ -53,6 +53,7 @@ public class InitializeThread implements Runnable {
 
         // Call Rocky's Utility function
         // Use Node's actual server address
+        Utilities.generateFingerTable(this.node.getFingerTable(), this.node.getPeerObject());
 
         try {
             this.socket.close();
