@@ -147,7 +147,9 @@ public class PeerRequestThread implements Runnable {
 		//current node's finger table
 		if(!finger.equals(node.getPeerObject())) {
 			int index = msg.getFingerIndex();
-			node.updateFingerTable(finger, msg.getFingerIndex());
+			//node.updateFingerTable(finger, msg.getFingerIndex());
+			Utilities.adjustFingerTable(node, finger);
+			node.setSuccessor(finger);
 			System.out.println("Finger table entry at index " + index + " updated to " + finger.getIP() + ".");
 		}
 		//if getFound() is true, then the current node is the target node
