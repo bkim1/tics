@@ -1,5 +1,10 @@
 package thread;
+
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Random;
 import object.*;
 import node.Node;
@@ -14,7 +19,7 @@ public class StabilizeThread implements Runnable {
     }
     
     public void run() {
-        console.log("Stabilize Thread starting...");
+        System.out.println("Stabilize Thread starting...");
     }
 
     public void executeMsg(Message msg) {
@@ -41,7 +46,7 @@ public class StabilizeThread implements Runnable {
 
     public void stabilzeInit() {
         Peer successor = this.node.getSuccessor();
-        Message msg = new Message("STABILIZE_PRED_REQ", successor);    // request successor's listed predecessor
+        Message msg = new Message(ReqType.STABILIZE_PRED_REQ, successor);    // request successor's listed predecessor
         try {
             InetAddress address = successor.getIP();
             int port = successor.getPort();
@@ -66,7 +71,7 @@ public class StabilizeThread implements Runnable {
         else if (sender.getKey() > pred.getKey()) {  // sender is closer to node than the listed predecessor
             this.node.setPredecessor(sender);
         }
-        Message resp = new Message("STABILIZE_PRED_RESP", pred);
+        Message resp = new Message(ReqType.STABILIZE_PRED_REQ, pred);
         try {
             InetAddress address = sender.getIP();
             int port = sender.getPort();
@@ -87,7 +92,7 @@ public class StabilizeThread implements Runnable {
         Peer myPeer = this.node.getPeerObject();
         if (successorPred.getKey() > myPeer.getKey()) {     // successor's listed predecessor is btw this node and successor
             this.node.setSuccessor(successorPred);      // set successor's new predecessor as node's new successor
-            Message notify = new Message("STABILIZE_PRED_SET", myPeer);  // notify succcessor's predecessor to update its predecessor to this node
+            Message notify = new Message(ReqType.STABILIZE_PRED_SET, myPeer);  // notify succcessor's predecessor to update its predecessor to this node
             try {
                 InetAddress address = successorPred.getIP();
                 int port = successorPred.getPort();
@@ -111,7 +116,7 @@ public class StabilizeThread implements Runnable {
             this.node.setPredecessor(newPred);
         }
         else if (newPred.getKey() > pred.getKey()) {
-            this.node.setPredecessor(sender);
+            this.node.setPredecessor(newPred);
         }
         return;
     }
@@ -127,7 +132,7 @@ public class StabilizeThread implements Runnable {
         Random rand = new Random();
         int i = rand.nextInt(fingerTable.length-1); // pick any but the last b/c checking their successor
         Peer finger = fingerTable[i];
-        Message req = new Message("SUCCESSOR_REQ", this.node.getPeerObject());
+        Message req = new Message(ReqType.SUCCESSOR_REQ, this.node.getPeerObject());
         //req.setFingerIndex(i);
         try {
             InetAddress address = finger.getIP();
@@ -147,7 +152,7 @@ public class StabilizeThread implements Runnable {
     private void handleSuccReq(Message msg) {
         Peer sender = msg.getPeer();
         Peer successor = this.node.getSuccessor();
-        Message resp = new Message("SUCCESSOR_RESP", successor);
+        Message resp = new Message(ReqType.SUCCESSOR_RESP, successor);
         //resp.setFinger(this.node.getPeerObject());
         //resp.setFingerIndex(msg.getFingerIndex());
         try {

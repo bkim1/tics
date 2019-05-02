@@ -140,25 +140,45 @@ public class Utilities {
 		Peer[] fingerTable = node.getFingerTable();
 		long currentKey = node.getPeerId();
 		long peerKey = peer.getKey();
-		long threshold, nextThreshold;
+		long threshold;
 
-		for (int i = 0; i < fingerTable.length; i++) {
-			threshold = (long) ((currentKey + Math.pow(2, i)) % Math.pow(2, RING_SIZE));
-			nextThreshold = (long) ((currentKey + Math.pow(2, i + 1)) % Math.pow(2, RING_SIZE));
+		for (int i = 0; i < fingerTable.length; i++) { 
+			// Empty fingerTable --> Assign peer and skip over rest
+			if (fingerTable[i] == null) {
+				fingerTable[i] = peer;
+				continue;
+			}
+
+			threshold = getFingerTableThreshold(currentKey, i);
+			System.out.println("Threshold: " + threshold);
 			Peer finger = fingerTable[i];
 
-			if (finger == null) {
-				fingerTable[i] = peer;
-			}
-			else if (threshold <= peerKey && 
-					 finger.getKey() > peerKey) {
+			// Standard case for inserting new node
+			// When new node's key is less than the finger's key
+			if (threshold <= peerKey && finger.getKey() > peerKey) {
+				System.out.println("Standard Case hit!");
 				// Shift nodes to the right for new entry
 				for (int j = i + 1; j < fingerTable.length; j++) {
 					fingerTable[j] = fingerTable[j - 1];
 				}
 				fingerTable[i] = peer;
 			}
+			// Case for when it loops around the ring
+			else if (finger.getKey() < threshold &&
+					 (peerKey < finger.getKey() || peerKey >= threshold)) {
+				System.out.println("Edge case hit!");
+				// Shift nodes to the right for new entry
+				for (int j = i + 1; j < fingerTable.length; j++) {
+					fingerTable[j] = fingerTable[j - 1];
+				}
+				fingerTable[i] = peer;	
+			}
 		}
+		node.updateFingerTable(fingerTable);
+	}
+
+	public static long getFingerTableThreshold(long currentKey, int index) {
+		return (long) ((currentKey + Math.pow(2, index)) % Math.pow(2, RING_SIZE));
 	}
 
 }

@@ -24,10 +24,9 @@ public class SetupRequestThread implements Runnable {
     public SetupRequestThread(Node node, Message msg) {
         this.node = node;
         this.peer = msg.getPeer();
-        System.out.println(this.peer);
-        System.out.println(this.node);
+        
         try {
-            this.socket = new Socket(this.peer.getIP(), this.peer.getPort());
+            this.socket = new Socket(this.peer.getIP(), this.peer.getSetupPort());
             this.inputStream = this.socket.getInputStream();
             this.outputStream = this.socket.getOutputStream();
         } catch(IOException e) {

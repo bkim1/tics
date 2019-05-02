@@ -10,12 +10,19 @@ public class Peer implements Serializable {
     private static final long serialVersionUID = 314156L;
 
     private InetAddress ip;
-    private int port;
+    private int port, setupPort;
     private long key;
 
     public Peer(InetAddress ip, int port, long key) {
         this.ip = ip;
         this.port = port;
+        this.key = key;
+    }
+    
+    public Peer(InetAddress ip, int port, int setupPort, long key) {
+        this.ip = ip;
+        this.port = port;
+        this.setupPort = setupPort;
         this.key = key;
     }
 
@@ -27,6 +34,9 @@ public class Peer implements Serializable {
 
     public int getPort() { return this.port; }
     public void setPort(int port) { this.port = port; }
+
+    public int getSetupPort() { return this.setupPort; }
+    public void setSetupPort(int setupPort) { this.setupPort = setupPort; }
 
     public long getKey() { return this.key; }
     public void setKey(long key) { this.key = key; }

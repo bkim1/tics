@@ -32,8 +32,8 @@ public class UserRequestThread implements Runnable {
                     break;
                     case 2: initializeLookupRequest();
                     break;
-                    // case 3: changeDefaultDownloadDirectory();
-                    // break;
+                    case 3: changeDefaultDownloadDirectory();
+                    break;
                     // case 4: leaveNetwork();
                     // break;
                     default: System.out.println("Please enter a valid input, an int between 1 and 4");
@@ -82,6 +82,7 @@ public class UserRequestThread implements Runnable {
         System.out.println("Enter the name of the file you wish to retrieve");
         Scanner retrieveScan = new Scanner(System.in);
         String requestedFileName = retrieveScan.nextLine();
+        retrieveScan.close();
         Peer peer = this.nc.getPeerObject();
         FileInfo requestFileInfo = this.nc.getRegisteredFileInfo(requestedFileName); //check if obj is null, bc then lookup can't proceed
         if (requestFileInfo == null) {
@@ -92,9 +93,9 @@ public class UserRequestThread implements Runnable {
         Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
     }
 
-    // public void changeDefaultDownloadDirectory(){
-        
-    // }
+    public void changeDefaultDownloadDirectory(){
+        this.nc.setDownloadLoc();
+    }
 
     // public void leaveNetwork(){
 
