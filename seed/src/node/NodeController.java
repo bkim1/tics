@@ -1,13 +1,12 @@
 package node;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 import object.*;
 import node.Node;
+import java.util.Scanner;
 
 public class NodeController {
     private Node node;
@@ -44,6 +43,14 @@ public class NodeController {
 
     public String getDownloadLoc() {
         return this.userProps.getProperty("downloadFileLoc");
+    }
+
+    public Object setDownloadLoc() {
+        System.out.println("Enter the full address of the folder to which you want to download to");
+        Scanner changeDirScan = new Scanner(System.in);
+        String requestedDirectory = changeDirScan.nextLine();
+        changeDirScan.close();
+        return this.userProps.setProperty("downloadFileLoc", requestedDirectory);
     }
 
     public String getSaveStateLoc() {
