@@ -37,9 +37,14 @@ public class Server {
         
         // Add continuous execution of save state
         Runnable saveRunnable = new SaveRunnable(this.node, this.nc);
-        ScheduledThreadPoolExecutor schedExec = new ScheduledThreadPoolExecutor(1);
-        schedExec.scheduleAtFixedRate(saveRunnable, 5, 5, TimeUnit.MINUTES);
+        ScheduledThreadPoolExecutor saveSchedExec = new ScheduledThreadPoolExecutor(1);
+        saveSchedExec.scheduleAtFixedRate(saveRunnable, 5, 5, TimeUnit.MINUTES);
         Runtime.getRuntime().addShutdownHook(new Thread(saveRunnable));
+
+        // Add continuous execution of Stabilization protocol
+        Runnable stabilizeRunnable = new StabilizeThread(this.node);
+        ScheduledThreadPoolExecutor stabilizeSchedExec = new ScheduledThreadPoolExecutor(1);
+        stabilizeSchedExec.scheduleAtFixedRate(stabilizeRunnable, 0, 1, TimeUnit.MINUTES);
     }
 
     public void run() throws IOException {
@@ -111,9 +116,9 @@ public class Server {
             Thread t1 = new Thread(uThread);
             t1.start();
     
-            // this.stabilizeThread = new StabilizeThread(this.nc);
-            // Thread t2 = new Thread(this.stabilizeThread);
-            // t2.start();
+            this.stabilizeThread = new StabilizeThread(this.node);
+            Thread t2 = new Thread(this.stabilizeThread);
+            t2.start();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
