@@ -1,6 +1,9 @@
 package thread;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.InputMismatchException;
@@ -48,14 +51,30 @@ public class UserRequestThread implements Runnable {
         System.out.println("Enter the full local address of the file you wish to upload");
         Scanner uploadScan = new Scanner(System.in);
         String newFileLocation = uploadScan.nextLine();
+
         int index = newFileLocation.lastIndexOf("/");
         if (index == newFileLocation.length()-1) {
             index = newFileLocation.lastIndexOf("/", index);
         }
+
         String newFileName = newFileLocation.substring(index + 1);
         FileInfo newFileInfo = new FileInfo(newFileLocation, newFileName); //register file info in nodecontroller
         Peer peer = this.nc.getPeerObject();
         Message msg = new Message(ReqType.UPLOAD, peer, newFileInfo.getKey());
+        
+        // Get byte[] of file being requested
+        try {
+            File file = new File(newFileLocation);
+            FileInputStream fileInputStream = new FileInputStream(file);
+            byte[] data = new byte[(int) file.length()];
+
+            fileInputStream.read(data);
+            msg.setData(data);
+            fileInputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Utilities.lookUp(msg, this.nc.getFingerTable(), this.nc.getPeerId());
     }
 
