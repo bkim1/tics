@@ -73,8 +73,12 @@ public class ForwardRequestThread implements Runnable {
                 ReceiveFileThread rfThread = new ReceiveFileThread(msg, this.nc, this.socket);
                 t = new Thread(rfThread);
                 break;
-            case STABILIZE: case STABILIZE_PRED_RESP: case STABILIZE_PRED_REQ:
-                // this.stabilizeThread.request(msg);
+            case STABILIZE_PRED_REQ:
+            case STABILIZE_PRED_RESP:
+            case STABILIZE_PRED_SET:
+            case SUCCESSOR_REQ:
+            case SUCCESSOR_RESP:
+                this.stabilizeThread.executeMsg(msg);
                 this.socket.close();
                 return null;
             case SETUP:
