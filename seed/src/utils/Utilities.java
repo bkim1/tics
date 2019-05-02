@@ -1,6 +1,5 @@
 package utils;
 
-import static utils.Constants.RING_SIZE;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -14,12 +13,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Scanner;
-
-import node.Node;
-
 import java.io.File;
 
+
+import node.Node;
 import object.*;
+import static utils.Constants.RING_SIZE;
+import static utils.Constants.RING_SIZE_BYTES;
+
 
 public class Utilities {
 
@@ -70,22 +71,39 @@ public class Utilities {
 		}
 		return finger;
 	}
-	
-	public static long generatePeerId(InetAddress ip, int port) {
-		long key = -1;
+
+	public static int generatePeerId(InetAddress ip, int port) {
+		int key = -1;
 		
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			digest.update(ip.toString().getBytes(Charset.forName("UTF-8")));
 			digest.update(Integer.valueOf(port).byteValue());
-			byte[] bytes = Arrays.copyOfRange(digest.digest(), 0, RING_SIZE);
-			ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			key = buffer.getLong();
-			// System.out.println("Int Key: " + Integer.toString(buffer.getInt()));
+			Byte bits = digest.digest()[RING_SIZE];
+			System.out.println(bits);
+			key = bits.intValue();
+			System.out.println("Int Key: " + key);
 			
 			if (key < 0) { key = -key; }
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
+		}
+		return key;
+	}
+
+	public static int generateFileKey(String filename, byte[] salt) {
+		int key = -1;
+		try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(filename.getBytes(Charset.forName("UTF-8")));
+            digest.update(salt);
+            Byte bits = digest.digest()[RING_SIZE];
+
+            key = bits.intValue();
+
+            if (key < 0) { key = -key; }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
 		}
 		return key;
 	}
@@ -126,7 +144,7 @@ public class Utilities {
 		long peerID = sender.getKey();
 		for(int i = 0; i < init.length; i++) {
 			//each entry is denoted by the hash of the node + 2^index of the finger table
-			long targetKey = (long) ((peerID + (long) Math.pow(2, i)) % Math.pow(2, 60));
+			long targetKey = getFingerTableThreshold(peerID, i);
 			Message msg = new Message(ReqType.JOIN, sender, targetKey, null);
 			msg.setFingerIndex(i);
 			msg.setFinger(sender);
@@ -178,7 +196,9 @@ public class Utilities {
 	}
 
 	public static long getFingerTableThreshold(long currentKey, int index) {
-		return (long) ((currentKey + Math.pow(2, index)) % Math.pow(2, RING_SIZE));
+		long sum = currentKey + (long) Math.pow(2, index);
+		long remainder = sum % (long) Math.pow(2, RING_SIZE);
+		return remainder;
 	}
 
 }
