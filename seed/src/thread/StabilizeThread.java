@@ -72,16 +72,20 @@ public class StabilizeThread implements Runnable {
         if (sender == null) { return; }
         Peer pred = this.node.getPredecessor();
         Peer myPeer = this.node.getPeerObject();
+        boolean changed = false;
         if (pred == null) {
             this.node.setPredecessor(sender);
             pred = sender;
+            changed = true;
         }
         else if (myPeer.getKey() < pred.getKey() && myPeer.getKey() < sender.getKey() &&
             pred.getKey() - myPeer.getKey() > sender.getKey() - myPeer.getKey()) {
                 this.node.setPredecessor(sender);
+                changed = true;
         }
         else if (sender.getKey() > pred.getKey()) {  // sender is closer to node than the listed predecessor
             this.node.setPredecessor(sender);
+            changed = true;
         }
         Message resp = new Message(ReqType.STABILIZE_PRED_RESP, pred);
         try {
@@ -96,14 +100,20 @@ public class StabilizeThread implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (changed) {
+            System.out.println("Stabilize updated Predecessor");
+        }
         return;
     }
 
     private void handleStabilizeResp(Message resp) {
         Peer successorPred = resp.getPeer();
         Peer myPeer = this.node.getPeerObject();
+        boolean sucChanged = false;
+        boolean predChanged = false;
         if (successorPred.getKey() > myPeer.getKey()) {     // successor's listed predecessor is btw this node and successor
             this.node.setSuccessor(successorPred);      // set successor's new predecessor as node's new successor
+            sucChanged = true;
             Message notify = new Message(ReqType.STABILIZE_PRED_SET, myPeer);  // notify succcessor's predecessor to update its predecessor to this node
             try {
                 InetAddress address = successorPred.getIP();
@@ -122,9 +132,11 @@ public class StabilizeThread implements Runnable {
         else if (successorPred.getKey() < myPeer.getKey()) {
             if (this.node.getPredecessor() == null) {
                 this.node.setPredecessor(successorPred);
+                predChanged = true;
             }
             else if (this.node.getPredecessor().getKey() < successorPred.getKey()) {
                 this.node.setPredecessor(successorPred);
+                predChanged = true;
             }
             Message notify = new Message(ReqType.STABILIZE_SUCC_SET, myPeer);  // notify succcessor's predecessor to update its predecessor to this node
             try {
@@ -139,6 +151,12 @@ public class StabilizeThread implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            if (sucChanged) {
+                System.out.println("Stabilize updated Successor");
+            }
+            if (predChanged) {
+                System.out.println("Stabilize updated Predecessor");
+            }
             return;
         }
     }
@@ -148,9 +166,11 @@ public class StabilizeThread implements Runnable {
         Peer pred = this.node.getPredecessor();
         if (pred == null) {
             this.node.setPredecessor(newPred);
+            System.out.println("Stabilize updated Predecessor");
         }
         else if (newPred.getKey() > pred.getKey()) {
             this.node.setPredecessor(newPred);
+            System.out.println("Stabilize updated Predecessor");
         }
         return;
     }
@@ -160,9 +180,11 @@ public class StabilizeThread implements Runnable {
         Peer suc = this.node.getSuccessor();
         if (suc == null) {
             this.node.setSuccessor(newSuc);
+            System.out.println("Stabilize updated Successor");
         }
         else if (newSuc.getKey() < suc.getKey()) {
             this.node.setSuccessor(newSuc);
+            System.out.println("Stabilize updated Successor");
         }
         return;
     }
