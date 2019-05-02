@@ -31,6 +31,9 @@ public class Utilities {
 			finger = fingerTable[i];
 			long nodeKey = finger.getKey();
 			long targetKey = msg.getKey();
+
+			System.out.println("Node Key: " + Long.toString(nodeKey));
+			System.out.println("Target Key: " + Long.toString(targetKey));
 			/*
 			if(finger.equals(msg.getPeer())) {
 				return null;
@@ -80,10 +83,7 @@ public class Utilities {
 			key = buffer.getLong();
 			// System.out.println("Int Key: " + Integer.toString(buffer.getInt()));
 			
-			if (key < 0) { 
-				key = -key;
-				System.out.println(Long.toString(key));
-			}
+			if (key < 0) { key = -key; }
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -135,17 +135,23 @@ public class Utilities {
 			System.out.println("Searching for " + i + "th entry in finger table...");
 		}
 	}
-
+	
 	public static void adjustFingerTable(Node node, Peer peer) {
 		Peer[] fingerTable = node.getFingerTable();
+		long currentKey = node.getPeerId();
 		long peerKey = peer.getKey();
+		long threshold, nextThreshold;
 
-		for (int i = 0; i < fingerTable.length - 1; i++) {
+		for (int i = 0; i < fingerTable.length; i++) {
+			threshold = (long) ((currentKey + Math.pow(2, i)) % Math.pow(2, RING_SIZE));
+			nextThreshold = (long) ((currentKey + Math.pow(2, i + 1)) % Math.pow(2, RING_SIZE));
 			Peer finger = fingerTable[i];
+
 			if (finger == null) {
 				fingerTable[i] = peer;
 			}
-			else if (finger.getKey() > peerKey) {
+			else if (threshold <= peerKey && 
+					 finger.getKey() > peerKey) {
 				// Shift nodes to the right for new entry
 				for (int j = i + 1; j < fingerTable.length; j++) {
 					fingerTable[j] = fingerTable[j - 1];

@@ -87,6 +87,8 @@ public class FileInfo implements Serializable {
 
             ByteBuffer buffer = ByteBuffer.wrap(buf);
             this.key = buffer.getLong();
+
+            if (key < 0) { key = -key; }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
